@@ -1,12 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
   Card,
   CardContent,
-  CardDescription,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
@@ -18,7 +16,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
   Pagination,
@@ -39,10 +36,8 @@ import { Input } from "@/components/ui/input";
 import {
   Loader2,
   MoreVertical,
-  Plus,
   Search,
   User,
-  UserPlus,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -201,13 +196,7 @@ export default function StaffList() {
     }
   };
 
-  const handleViewDetails = (staffId: string) => {
-    router.push(`/admin/staff/${staffId}`);
-  };
 
-  const handleAddStaff = () => {
-    router.push("/admin/staff/add-staff");
-  };
 
   const currentData = getPaginatedData();
   const pageNumbers = getPageNumbers();
@@ -231,13 +220,6 @@ export default function StaffList() {
               Quản lý tất cả nhân viên trong hệ thống
             </p>
           </div>
-          <Button
-            onClick={handleAddStaff}
-            className="bg-primary hover:bg-primary/90 flex items-center gap-2 self-start"
-          >
-            <UserPlus className="h-4 w-4" />
-            Thêm nhân viên mới
-          </Button>
         </div>
 
         {/* Error message */}
@@ -391,13 +373,6 @@ export default function StaffList() {
                                 align="end"
                                 className="w-[160px]"
                               >
-                                <DropdownMenuItem
-                                  onClick={() =>
-                                    handleViewDetails(staff.accountId)
-                                  }
-                                >
-                                  Xem chi tiết
-                                </DropdownMenuItem>
                                 <DropdownMenuItem
                                   onClick={() =>
                                     router.push(

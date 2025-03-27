@@ -36,7 +36,7 @@ export default function RootLayout({
           storageKey="dashboard-theme"
         >
           {children}
-          <Toaster />
+          <Toaster richColors/>
         </ThemeProvider>
       </body>
     </html>

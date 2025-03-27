@@ -1,6 +1,5 @@
 import Navbar from "@/components/Navbar";
 import AdminSidebar from "@/components/AdminSidebar";
-import { Toaster } from "sonner";
 
 const AdminLayout = ({ children }: { children: React.ReactNode }) => {
   return (
@@ -11,7 +10,6 @@ const AdminLayout = ({ children }: { children: React.ReactNode }) => {
           <AdminSidebar />
         </div>
         <div className="p-5 w-full md:max-w-[1140px]">{children}</div>
-        <Toaster richColors position="top-right" />
       </div>
     </>
   );
