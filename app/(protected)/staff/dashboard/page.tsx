@@ -443,13 +443,19 @@ export default function StaffDashboard() {
             <Table>
               <TableHeader>
                 <TableRow className="bg-slate-50 dark:bg-slate-800">
-                  <TableHead className="font-medium py-3 pl-6">
+                  <TableHead className="font-medium text-center py-3 pl-6">
                     Biển số xe
                   </TableHead>
-                  <TableHead className="font-medium py-3">Loại xe</TableHead>
-                  <TableHead className="font-medium py-3">Thời gian</TableHead>
-                  <TableHead className="font-medium py-3">Loại vé</TableHead>
-                  <TableHead className="font-medium py-3 pr-6">
+                  <TableHead className="font-medium text-center py-3">
+                    Loại xe
+                  </TableHead>
+                  <TableHead className="font-medium text-center py-3">
+                    Thời gian
+                  </TableHead>
+                  <TableHead className="font-medium text-center py-3">
+                    Loại vé
+                  </TableHead>
+                  <TableHead className="font-medium text-center py-3 pr-6">
                     Trạng thái
                   </TableHead>
                 </TableRow>
@@ -480,87 +486,93 @@ export default function StaffDashboard() {
                           : "bg-slate-50/50 dark:bg-slate-900/50"
                       }
                     >
-                      <TableCell className="font-medium pl-6">
+                      <TableCell className="font-medium text-center pl-6">
                         {record.licensePlate}
                       </TableCell>
                       <TableCell>
                         {record.vehicleType === "Bicycle" && (
-                          <span className="flex items-center gap-1">
+                          <span className="flex items-center justify-center gap-1">
                             <span className="w-2 h-2 rounded-full bg-yellow-500 inline-block"></span>
                             Xe đạp
                           </span>
                         )}
                         {record.vehicleType === "Motorbike" && (
-                          <span className="flex items-center gap-1">
+                          <span className="flex items-center justify-center gap-1">
                             <span className="w-2 h-2 rounded-full bg-blue-500 inline-block"></span>
                             Xe máy
                           </span>
                         )}
                         {record.vehicleType === "Scooter" && (
-                          <span className="flex items-center gap-1">
+                          <span className="flex items-center justify-center gap-1">
                             <span className="w-2 h-2 rounded-full bg-green-500 inline-block"></span>
                             Xe tay ga
                           </span>
                         )}
                       </TableCell>
-                      <TableCell className="font-mono text-xs">
+                      <TableCell className="font-mono text-center text-xs">
                         {formatTimestamp(record.timestamp)}
                       </TableCell>
-                      <TableCell>
+                      <TableCell className="text-center">
                         {record.ticketType === "MONTHLY" ? (
-                          <Badge
-                            variant="outline"
-                            className="bg-green-100 text-green-800 border-green-200"
-                          >
-                            Vé tháng
-                          </Badge>
+                          <div className="flex justify-center">
+                            <Badge
+                              variant="outline"
+                              className="bg-green-100 text-green-800 border-green-200"
+                            >
+                              Vé tháng
+                            </Badge>
+                          </div>
                         ) : (
-                          <Badge
-                            variant="outline"
-                            className="bg-blue-100 text-blue-800 border-blue-200"
-                          >
-                            Vé ngày
-                          </Badge>
+                          <div className="flex justify-center">
+                            <Badge
+                              variant="outline"
+                              className="bg-blue-100 text-blue-800 border-blue-200"
+                            >
+                              Vé ngày
+                            </Badge>
+                          </div>
                         )}
                       </TableCell>
-                      <TableCell className="pr-6">
-                        {record.eventType === "ENTRY" ? (
-                          <Badge className="bg-green-100 text-green-800 border-green-200 flex items-center gap-1">
-                            <svg
-                              xmlns="http://www.w3.org/2000/svg"
-                              width="12"
-                              height="12"
-                              viewBox="0 0 24 24"
-                              fill="none"
-                              stroke="currentColor"
-                              strokeWidth="2"
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                            >
-                              <path d="m15 14 5-5-5-5"></path>
-                              <path d="M4 20v-7a4 4 0 0 1 4-4h12"></path>
-                            </svg>
-                            Vào
-                          </Badge>
-                        ) : (
-                          <Badge className="bg-red-100 text-red-800 border-red-200 flex items-center gap-1">
-                            <svg
-                              xmlns="http://www.w3.org/2000/svg"
-                              width="12"
-                              height="12"
-                              viewBox="0 0 24 24"
-                              fill="none"
-                              stroke="currentColor"
-                              strokeWidth="2"
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                            >
-                              <path d="m9 10-5 5 5 5"></path>
-                              <path d="M20 4v7a4 4 0 0 1-4 4H4"></path>
-                            </svg>
-                            Ra
-                          </Badge>
-                        )}
+                      <TableCell className="pr-6 text-center">
+                        <div className="flex justify-center">
+                          {record.eventType === "ENTRY" ? (
+                            <Badge className="bg-green-100 text-green-800 border-green-200 flex items-center gap-1">
+                              <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                width="12"
+                                height="12"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                strokeWidth="2"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                              >
+                                <path d="m15 14 5-5-5-5"></path>
+                                <path d="M4 20v-7a4 4 0 0 1 4-4h12"></path>
+                              </svg>
+                              Vào
+                            </Badge>
+                          ) : (
+                            <Badge className="bg-red-100 text-red-800 border-red-200 flex items-center gap-1">
+                              <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                width="12"
+                                height="12"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                strokeWidth="2"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                              >
+                                <path d="m9 10-5 5 5 5"></path>
+                                <path d="M20 4v7a4 4 0 0 1-4 4H4"></path>
+                              </svg>
+                              Ra
+                            </Badge>
+                          )}
+                        </div>
                       </TableCell>
                     </TableRow>
                   ))

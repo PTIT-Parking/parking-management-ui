@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import logo from "../img/PTIT-parking.png";
+import logo from "../img/PTIT-parking-removebg-preview.png";
 import {
   DropdownMenu,
   DropdownMenuContent,

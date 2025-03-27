@@ -1,22 +1,20 @@
 "use client";
 
-import { useEffect } from "react";
-import { useRouter } from "next/navigation";
+import Navbar from "@/components/Navbar";
+import StaffSidebar from "@/components/StaffSidebar";
 
-export default function ProtectedLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
-  const router = useRouter();
+const StaffLayout = ({ children }: { children: React.ReactNode }) => {
+  return (
+    <>
+      <Navbar />
+      <div className="flex">
+        <div className="hidden md:block h-[100vh] w-[300px]">
+          <StaffSidebar />
+        </div>
+        <div className="p-5 w-full md:max-w-[1140px]">{children}</div>
+      </div>
+    </>
+  );
+};
 
-  // Kiểm tra authentication
-  useEffect(() => {
-    const token = localStorage.getItem("token") || sessionStorage.getItem("token");
-    if (!token) {
-      router.push("/login");
-    }
-  }, [router]);
-
-  return <>{children}</>;
-}
+export default StaffLayout;
