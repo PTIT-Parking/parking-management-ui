@@ -23,7 +23,7 @@ export function useFetchWithAuth() {
     router.push("/login");
   }, [router]);
 
-  const fetchWithAuth = useCallback(async <T>(url: string, options: RequestInit = {}): Promise<T | null> => {
+  const fetchWithAuth = useCallback(async <T>(url: string, options: RequestInit = {}): Promise<T> => {
     setLoading(true);
     
     try {
@@ -31,7 +31,7 @@ export function useFetchWithAuth() {
       
       if (!token) {
         handleUnauthorized();
-        return null;
+        throw new Error("Unauthorized: No token available");
       }
       
       const response = await fetch(url, {
@@ -43,16 +43,17 @@ export function useFetchWithAuth() {
         },
       });
       
+      // Xử lý 401 Unauthorized
       if (response.status === 401) {
         handleUnauthorized();
-        return null;
+        throw new Error("Unauthorized");
       }
       
-      if (!response.ok) {
-        throw new Error(`HTTP error! Status: ${response.status}`);
-      }
+      // Đọc response body dù status code là gì
+      const responseData = await response.json() as T;
       
-      return await response.json() as T;
+      // trả về dữ liệu API để component xử lý
+      return responseData;
     } catch (error) {
       console.error("API request failed:", error);
       throw error;

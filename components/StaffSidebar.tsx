@@ -107,7 +107,7 @@ const StaffSidebar = () => {
               </span>
             </AccordionTrigger>
             <AccordionContent className="pl-6 py-0">
-              <Link href="/staff/monthly/create">
+              <Link href="/staff/monthly/register">
                 <div
                   className={cn(
                     "flex w-full items-center py-2 text-sm transition-all hover:bg-slate-100 rounded-md",

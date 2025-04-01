@@ -127,9 +127,9 @@ export default function VehicleEntryPage() {
   const [loading, setLoading] = useState(false);
   const [fetchingTypes, setFetchingTypes] = useState(true);
   const [showSuccessDialog, setShowSuccessDialog] = useState(false);
-  const [entryRecord, setEntryRecord] = useState<EntryResponse["result"] | null>(
-    null
-  );
+  const [entryRecord, setEntryRecord] = useState<
+    EntryResponse["result"] | null
+  >(null);
 
   // Khởi tạo form (giữ nguyên)
   const form = useForm<FormValues>({
@@ -140,47 +140,28 @@ export default function VehicleEntryPage() {
       vehicleTypeId: "",
       cardId: "",
     },
-    mode: "onChange",
+    mode: "onSubmit",
   });
 
-  // Watch fields (giữ nguyên)
+  // Watch fields
   const watchLicensePlate = form.watch("licensePlate");
   const watchIdentifier = form.watch("identifier");
+  const isLoading = loading || apiLoading;
 
-  // useEffects cho watch fields (giữ nguyên)
+  // useEffects cho watch fields
   useEffect(() => {
+    // Nếu có biển số xe, xóa identifier
     if (watchLicensePlate && form.getValues("identifier")) {
       form.setValue("identifier", "");
     }
-  }, [watchLicensePlate, form]);
 
-  useEffect(() => {
+    // Nếu có identifier, xóa biển số xe
     if (watchIdentifier && form.getValues("licensePlate")) {
       form.setValue("licensePlate", "");
     }
-  }, [watchIdentifier, form]);
+  }, [watchLicensePlate, watchIdentifier, form]);
 
-  useEffect(() => {
-    if (watchLicensePlate) {
-      if (form.getValues("identifier")) {
-        form.setValue("identifier", "");
-      }
-      form.clearErrors("licensePlate");
-      form.clearErrors("identifier");
-    }
-  }, [watchLicensePlate, form]);
-
-  useEffect(() => {
-    if (watchIdentifier) {
-      if (form.getValues("licensePlate")) {
-        form.setValue("licensePlate", "");
-      }
-      form.clearErrors("licensePlate");
-      form.clearErrors("identifier");
-    }
-  }, [watchIdentifier, form]);
-
-  // Refactor: Fetch danh sách loại xe từ API sử dụng fetchWithAuth
+  // Fetch danh sách loại xe từ API sử dụng fetchWithAuth
   useEffect(() => {
     const fetchVehicleTypes = async () => {
       try {
@@ -227,6 +208,16 @@ export default function VehicleEntryPage() {
         cardId: values.cardId ? values.cardId : "",
       };
 
+      if (!values.cardId) {
+        // Đặt lỗi cho trường cardId
+        form.setError("cardId", {
+          type: "manual",
+          message: "Mã số thẻ không được để trống",
+        });
+        setLoading(false);
+        return;
+      }
+
       const data = await fetchWithAuth<EntryResponse>(
         "http://localhost:8080/api/parking/entry",
         {
@@ -245,19 +236,16 @@ export default function VehicleEntryPage() {
             type: "manual",
             message: "Biển số này đã tồn tại trong bãi",
           });
-          toast.error("Biển số này đã tồn tại trong bãi");
         } else if (data.code === 4007) {
           form.setError("identifier", {
             type: "manual",
             message: "Identifier này đã tồn tại trong bãi",
           });
-          toast.error("Identifier này đã tồn tại trong bãi");
         } else if (data.code === 4005) {
           form.setError("cardId", {
             type: "manual",
             message: "Thẻ này đã được sử dụng cho xe khác",
           });
-          toast.error("Thẻ này đã được sử dụng cho xe khác");
         } else {
           toast.error(data.message || "Lỗi không xác định");
         }
@@ -286,7 +274,7 @@ export default function VehicleEntryPage() {
   };
 
   // Cập nhật loading state để kết hợp cả loading từ form và từ API
-  if (fetchingTypes || apiLoading) {
+  if (fetchingTypes) {
     return (
       <div className="flex justify-center items-center h-64">
         <Loader2 className="h-8 w-8 animate-spin text-primary" />
@@ -319,7 +307,16 @@ export default function VehicleEntryPage() {
                         <Input
                           placeholder="Ví dụ: 59A-12345"
                           {...field}
-                          disabled={!!watchIdentifier}
+                          disabled={!!watchIdentifier || isLoading}
+                          onChange={(e) => {
+                            field.onChange(e);
+                            // Xóa lỗi khi người dùng bắt đầu nhập
+                            form.clearErrors("licensePlate");
+                          }}
+                          // Thêm sự kiện onFocus để xóa lỗi khi click vào
+                          onFocus={() => {
+                            form.clearErrors("licensePlate");
+                          }}
                         />
                       </FormControl>
                       <div className="min-h-[20px]">
@@ -339,7 +336,14 @@ export default function VehicleEntryPage() {
                         <Input
                           placeholder="Nhập ID nếu không có biển số"
                           {...field}
-                          disabled={!!watchLicensePlate}
+                          disabled={!!watchLicensePlate || isLoading}
+                          onChange={(e) => {
+                            field.onChange(e);
+                            form.clearErrors("identifier");
+                          }}
+                          onFocus={() => {
+                            form.clearErrors("identifier");
+                          }}
                         />
                       </FormControl>
                       <div className="min-h-[20px]">
@@ -358,7 +362,10 @@ export default function VehicleEntryPage() {
                     <FormItem className="flex flex-col h-full">
                       <FormLabel>Loại xe</FormLabel>
                       <Select
-                        onValueChange={field.onChange}
+                        onValueChange={(value) => {
+                          field.onChange(value);
+                          form.clearErrors("vehicleTypeId");
+                        }}
                         defaultValue={field.value}
                         value={field.value}
                       >
@@ -395,6 +402,14 @@ export default function VehicleEntryPage() {
                           type="number"
                           min={1}
                           max={999}
+                          disabled={isLoading}
+                          onChange={(e) => {
+                            field.onChange(e);
+                            form.clearErrors("cardId");
+                          }}
+                          onFocus={() => {
+                            form.clearErrors("cardId");
+                          }}
                         />
                       </FormControl>
                       <div className="min-h-[20px]">
@@ -408,7 +423,7 @@ export default function VehicleEntryPage() {
               <Button
                 type="submit"
                 className="w-full"
-                disabled={loading || apiLoading} // Thêm apiLoading
+                disabled={isLoading} // Thêm apiLoading
               >
                 {loading || apiLoading ? (
                   <>

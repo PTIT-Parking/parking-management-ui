@@ -63,39 +63,20 @@ interface ExitResponse {
 // Định nghĩa schema xác thực form dùng Zod
 const formSchema = z
   .object({
-    licensePlate: z
-      .string()
-      .refine((val) => val.trim() !== "" || false, {
-        message: "Biển số xe không được để trống nếu không dùng identifier",
-      })
-      .optional()
-      .or(z.literal("")),
-    identifier: z
-      .string()
-      .refine((val) => val.trim() !== "" || false, {
-        message: "Identifier không được để trống nếu không dùng biển số xe",
-      })
-      .optional()
-      .or(z.literal("")),
-    cardId: z
-      .string()
-      .refine(
-        (val) => {
-          if (val === "") return true; // Cho phép để trống
-
-          const num = parseInt(val);
-          return !isNaN(num) && num >= 1 && num <= 999;
-        },
-        {
-          message: "Mã số thẻ phải là số nguyên từ 1-999 hoặc để trống",
-        }
-      )
-      .optional()
-      .or(z.literal("")),
+    licensePlate: z.string().optional().or(z.literal("")),
+    identifier: z.string().optional().or(z.literal("")),
+    cardId: z.string().refine(
+      (val) => {
+        const num = parseInt(val);
+        return !isNaN(num) && num >= 1 && num <= 999;
+      },
+      {
+        message: "Mã số thẻ phải là số nguyên từ 1-999",
+      }
+    ),
   })
-  .refine((data) => data.licensePlate || data.identifier || data.cardId, {
-    message:
-      "Phải nhập ít nhất một trong ba: Biển số xe, Identifier hoặc Mã thẻ",
+  .refine((data) => data.licensePlate || data.identifier, {
+    message: "Vui lòng nhập biển số xe hoặc identifier",
     path: ["licensePlate"],
   });
 
@@ -119,7 +100,7 @@ export default function VehicleExitPage() {
       identifier: "",
       cardId: "",
     },
-    mode: "onChange",
+    mode: "onSubmit",
   });
 
   // Xử lý khi một trường thay đổi để kiểm tra logic
@@ -132,7 +113,6 @@ export default function VehicleExitPage() {
       if (form.getValues("identifier")) {
         form.setValue("identifier", "");
       }
-      form.clearErrors(["licensePlate", "identifier", "cardId"]);
     }
   }, [watchLicensePlate, form]);
 
@@ -142,7 +122,6 @@ export default function VehicleExitPage() {
       if (form.getValues("licensePlate")) {
         form.setValue("licensePlate", "");
       }
-      form.clearErrors(["licensePlate", "identifier", "cardId"]);
     }
   }, [watchIdentifier, form]);
 
@@ -150,6 +129,25 @@ export default function VehicleExitPage() {
   const onSubmit = async (values: FormValues) => {
     try {
       setLoading(true);
+
+      // Kiểm tra trước khi gọi API
+      if (!values.cardId) {
+        form.setError("cardId", {
+          type: "manual",
+          message: "Mã số thẻ không được để trống",
+        });
+        setLoading(false);
+        return;
+      }
+
+      if (!values.licensePlate && !values.identifier) {
+        form.setError("licensePlate", {
+          type: "manual",
+          message: "Vui lòng nhập biển số xe hoặc identifier",
+        });
+        setLoading(false);
+        return;
+      }
 
       // Chuẩn bị dữ liệu gửi lên server
       const requestBody = {
@@ -185,7 +183,36 @@ export default function VehicleExitPage() {
       }
     } catch (error) {
       console.error("Error submitting form:", error);
-      setErrorMessage("Đã xảy ra lỗi khi ghi nhận xe ra bãi");
+
+      const errorMessage =
+        error instanceof Error ? error.message : String(error);
+
+      if (errorMessage.includes("Status: 400")) {
+        // Kiểm tra thông tin cụ thể để hiển thị lỗi chi tiết
+        if (!form.getValues("cardId")) {
+          form.setError("cardId", {
+            type: "manual",
+            message: "Mã số thẻ không được để trống",
+          });
+          setErrorMessage("Vui lòng nhập mã số thẻ");
+        } else if (
+          !form.getValues("licensePlate") &&
+          !form.getValues("identifier")
+        ) {
+          form.setError("licensePlate", {
+            type: "manual",
+            message: "Vui lòng nhập biển số xe hoặc identifier",
+          });
+          setErrorMessage("Vui lòng nhập biển số xe hoặc identifier");
+        } else {
+          setErrorMessage(
+            "Dữ liệu không hợp lệ. Vui lòng kiểm tra lại thông tin nhập."
+          );
+        }
+      } else {
+        setErrorMessage("Đã xảy ra lỗi khi ghi nhận xe ra bãi");
+      }
+
       setShowErrorDialog(true);
     } finally {
       setLoading(false);
@@ -238,6 +265,9 @@ export default function VehicleExitPage() {
                           placeholder="Ví dụ: 59A-12345"
                           {...field}
                           disabled={!!watchIdentifier || isLoading}
+                          onFocus={() => {
+                            form.clearErrors("licensePlate");
+                          }}
                         />
                       </FormControl>
                       <div className="min-h-[20px]">
@@ -258,6 +288,9 @@ export default function VehicleExitPage() {
                           placeholder="Nhập ID nếu không có biển số"
                           {...field}
                           disabled={!!watchLicensePlate || isLoading}
+                          onFocus={() => {
+                            form.clearErrors("identifier");
+                          }}
                         />
                       </FormControl>
                       <div className="min-h-[20px]">
@@ -281,6 +314,9 @@ export default function VehicleExitPage() {
                           min={1}
                           max={999}
                           disabled={isLoading}
+                          onFocus={() => {
+                            form.clearErrors("cardId");
+                          }}
                         />
                       </FormControl>
                       <div className="min-h-[20px]">
