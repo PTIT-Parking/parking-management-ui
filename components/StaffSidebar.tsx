@@ -66,7 +66,7 @@ const StaffSidebar = () => {
                       "bg-slate-100 text-slate-900 font-medium"
                   )}
                 >
-                  Xe vào bãi
+                  Ghi nhận xe vào
                 </div>
               </Link>
               <Link href="/staff/parking/exit">
@@ -77,7 +77,7 @@ const StaffSidebar = () => {
                       "bg-slate-100 text-slate-900 font-medium"
                   )}
                 >
-                  Xe ra bãi
+                  Ghi nhận xe ra
                 </div>
               </Link>
               <Link href="/staff/parking/records">

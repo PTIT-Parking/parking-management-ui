@@ -340,25 +340,25 @@ export default function StaffList() {
               <Table className="table-fixed w-full">
                 <TableHeader>
                   <TableRow className="bg-slate-50 dark:bg-slate-800">
-                    <TableHead className="font-medium py-3 text-center w-[15%] whitespace-nowrap">
+                    <TableHead className="font-medium py-3 text-center w-[12%] whitespace-nowrap">
                       Tên nhân viên
                     </TableHead>
-                    <TableHead className="font-medium py-3 text-center w-[15%] whitespace-nowrap">
+                    <TableHead className="font-medium py-3 text-center w-[12%] whitespace-nowrap">
                       CCCD
                     </TableHead>
                     <TableHead className="font-medium py-3 text-center w-[10%] whitespace-nowrap">
                       Username
                     </TableHead>
-                    <TableHead className="font-medium py-3 hidden md:table-cell text-center w-[18%] whitespace-nowrap">
+                    <TableHead className="font-medium py-3 hidden md:table-cell text-center w-[15%] whitespace-nowrap">
                       Email
                     </TableHead>
                     <TableHead className="font-medium py-3 hidden md:table-cell text-center w-[10%] whitespace-nowrap">
                       Số điện thoại
                     </TableHead>
-                    <TableHead className="font-medium py-3 text-center w-[8%] whitespace-nowrap">
+                    <TableHead className="font-medium py-3 text-center w-[10%] whitespace-nowrap">
                       Vai trò
                     </TableHead>
-                    <TableHead className="font-medium py-3 text-center w-[8%] whitespace-nowrap">
+                    <TableHead className="font-medium py-3 text-center w-[10%] whitespace-nowrap">
                       Trạng thái
                     </TableHead>
                     <TableHead className="font-medium py-3 hidden md:table-cell text-center w-[10%] whitespace-nowrap">
@@ -392,12 +392,12 @@ export default function StaffList() {
                         className="hover:bg-slate-50/70"
                       >
                         {/* Tên nhân viên */}
-                        <TableCell className="text-center w-[15%] truncate">
+                        <TableCell className="text-center w-[12%] truncate">
                           {staff.name}
                         </TableCell>
 
                         {/* CCCD */}
-                        <TableCell className="text-center w-[15%] truncate">
+                        <TableCell className="text-center w-[12%] truncate">
                           {staff.identification}
                         </TableCell>
 
@@ -407,7 +407,7 @@ export default function StaffList() {
                         </TableCell>
 
                         {/* Email */}
-                        <TableCell className="hidden md:table-cell text-center truncate w-[18%]">
+                        <TableCell className="hidden md:table-cell text-center truncate w-[15%]">
                           {staff.email}
                         </TableCell>
 
@@ -417,7 +417,7 @@ export default function StaffList() {
                         </TableCell>
 
                         {/* Vai trò */}
-                        <TableCell className="text-center w-[8%]">
+                        <TableCell className="text-center w-[10%]">
                           <div className="flex justify-center">
                             <Badge className="bg-blue-100 text-blue-800 border-blue-200">
                               Nhân viên
@@ -426,7 +426,7 @@ export default function StaffList() {
                         </TableCell>
 
                         {/* Trạng thái */}
-                        <TableCell className="text-center w-[8%]">
+                        <TableCell className="text-center w-[10%]">
                           <div className="flex justify-center">
                             {staff.isActive ? (
                               <Badge className="bg-green-100 text-green-800 border-green-200">

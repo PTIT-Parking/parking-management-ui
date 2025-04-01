@@ -9,7 +9,7 @@ const AdminLayout = ({ children }: { children: React.ReactNode }) => {
         <div className="hidden md:block h-[100vh] w-[300px]">
           <AdminSidebar />
         </div>
-        <div className="p-5 w-full md:max-w-[1140px]">{children}</div>
+        <div className="p-5 w-full">{children}</div>
       </div>
     </>
   );

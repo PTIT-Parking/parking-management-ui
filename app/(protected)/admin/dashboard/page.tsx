@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import {
   Card,
   CardContent,
@@ -14,6 +14,8 @@ import {
   TrendingDown,
   Users,
   Activity,
+  Calendar,
+  TimerIcon,
 } from "lucide-react";
 import {
   Table,
@@ -33,211 +35,38 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
-
-interface VehicleStats {
-  motorbike: number;
-  scooter: number;
-  bicycle: number;
-  total: number;
-}
-
-interface VehicleRecord {
-  licensePlate: string;
-  vehicleType: "Bicycle" | "Motorbike" | "Scooter";
-  ticketType: "DAILY" | "MONTHLY";
-  timestamp: string;
-  eventType: "ENTRY" | "EXIT";
-}
-
-interface ApiResponse {
-  code: number;
-  result: VehicleRecord[];
-  message: string;
-}
-
-const ITEMS_PER_PAGE = 5; // Số lượng record trên mỗi trang
+import { useDashboard } from "@/hooks/use-dashboard";
 
 export default function AdminDashboard() {
-  const [loading, setLoading] = useState(true);
-  const [currentStats, setCurrentStats] = useState<VehicleStats | null>(null);
-  const [recentActivity, setRecentActivity] = useState<VehicleRecord[]>([]);
-  const [error, setError] = useState<string | null>(null);
+  const {
+    loading,
+    error,
+    currentStats,
+    entriesCount,
+    exitsCount,
+    currentPage,
+    totalPages,
+    getPaginatedData,
+    getPageNumbers,
+    handlePageChange,
+    formatTimestamp,
+    getVehicleTypeCount
+  } = useDashboard(5); // 5 items per page
 
-  // Pagination states
-  const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
-
+  // Script để cập nhật thời gian thực
   useEffect(() => {
-    const fetchDashboardData = async () => {
-      try {
-        setLoading(true);
-        setError(null);
-
-        // Lấy token xác thực từ localStorage
-        const token = localStorage.getItem("token");
-
-        if (!token) {
-          throw new Error("Bạn chưa đăng nhập hoặc phiên làm việc đã hết hạn");
-        }
-
-        // Gọi API với token xác thực
-        const response = await fetch(
-          "http://localhost:8080/api/parking/today",
-          {
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-
-        if (!response.ok) {
-          const errorData = await response.json().catch(() => ({}));
-          throw new Error(
-            errorData.message || `HTTP error! Status: ${response.status}`
-          );
-        }
-
-        const data: ApiResponse = await response.json();
-
-        if (data.code === 1000) {
-          // Lưu trữ dữ liệu hoạt động
-          const sortedActivity = [...data.result].sort(
-            (a, b) =>
-              new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
-          );
-
-          setRecentActivity(sortedActivity);
-          setTotalPages(Math.ceil(sortedActivity.length / ITEMS_PER_PAGE));
-
-          // Tính toán số lượng xe hiện tại từ dữ liệu API
-          const stats = calculateVehicleStats(data.result);
-          setCurrentStats(stats);
-        } else {
-          throw new Error(
-            "Lỗi khi lấy dữ liệu: " + (data.message || "Không xác định")
-          );
-        }
-      } catch (err) {
-        console.error("Error fetching dashboard data:", err);
-        setError(
-          err instanceof Error ? err.message : "Đã xảy ra lỗi khi tải dữ liệu"
-        );
-      } finally {
-        setLoading(false);
+    const updateTime = () => {
+      const timeElement = document.getElementById('live-time');
+      if (timeElement) {
+        timeElement.textContent = new Date().toLocaleTimeString('vi-VN');
       }
     };
-
-    fetchDashboardData();
+    
+    const interval = setInterval(updateTime, 1000);
+    updateTime();
+    
+    return () => clearInterval(interval);
   }, []);
-
-  // Hàm tính toán thống kê xe từ dữ liệu API
-  const calculateVehicleStats = (records: VehicleRecord[]): VehicleStats => {
-    // Khởi tạo đối tượng theo dõi xe trong bãi
-    const currentVehicles: Record<string, VehicleRecord> = {};
-
-    // Duyệt qua tất cả các bản ghi theo thứ tự thời gian
-    // Chúng ta sắp xếp để đảm bảo xử lý theo đúng thứ tự thời gian
-    const sortedRecords = [...records].sort(
-      (a, b) =>
-        new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
-    );
-
-    for (const record of sortedRecords) {
-      if (record.eventType === "ENTRY") {
-        // Xe vào bãi, thêm vào tracking
-        currentVehicles[record.licensePlate] = record;
-      } else if (record.eventType === "EXIT") {
-        // Xe ra khỏi bãi, xóa khỏi tracking
-        delete currentVehicles[record.licensePlate];
-      }
-    }
-
-    // Đếm số lượng xe hiện tại theo loại
-    let motorbike = 0;
-    let scooter = 0;
-    let bicycle = 0;
-
-    Object.values(currentVehicles).forEach((vehicle) => {
-      switch (vehicle.vehicleType) {
-        case "Motorbike":
-          motorbike++;
-          break;
-        case "Scooter":
-          scooter++;
-          break;
-        case "Bicycle":
-          bicycle++;
-          break;
-      }
-    });
-
-    const total = motorbike + scooter + bicycle;
-
-    return {
-      motorbike,
-      scooter,
-      bicycle,
-      total,
-    };
-  };
-
-  // Lấy các record cho trang hiện tại
-  const getPaginatedData = () => {
-    const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
-    const endIndex = startIndex + ITEMS_PER_PAGE;
-    return recentActivity.slice(startIndex, endIndex);
-  };
-
-  // Tạo mảng số trang để hiển thị
-  const getPageNumbers = () => {
-    const pageNumbers = [];
-    const maxPagesToShow = 5; // Số lượng nút trang tối đa hiển thị
-
-    if (totalPages <= maxPagesToShow) {
-      // Nếu tổng số trang nhỏ hơn hoặc bằng số lượng nút tối đa, hiển thị tất cả
-      for (let i = 1; i <= totalPages; i++) {
-        pageNumbers.push(i);
-      }
-    } else {
-      // Nếu tổng số trang lớn hơn số lượng nút tối đa
-      let startPage = Math.max(1, currentPage - Math.floor(maxPagesToShow / 2));
-      let endPage = startPage + maxPagesToShow - 1;
-
-      if (endPage > totalPages) {
-        endPage = totalPages;
-        startPage = Math.max(1, endPage - maxPagesToShow + 1);
-      }
-
-      for (let i = startPage; i <= endPage; i++) {
-        pageNumbers.push(i);
-      }
-    }
-
-    return pageNumbers;
-  };
-
-  // Xử lý sự kiện thay đổi trang
-  const handlePageChange = (pageNumber: number) => {
-    setCurrentPage(pageNumber);
-  };
-
-  // Format thời gian thân thiện với người dùng
-  const formatTimestamp = (timestamp: string) => {
-    try {
-      const date = new Date(timestamp);
-      return date.toLocaleString("vi-VN", {
-        year: "numeric",
-        month: "2-digit",
-        day: "2-digit",
-        hour: "2-digit",
-        minute: "2-digit",
-        second: "2-digit",
-      });
-    } catch (e) {
-      return timestamp; // Nếu không parse được, trả về nguyên giá trị
-    }
-  };
 
   if (loading) {
     return (
@@ -257,69 +86,88 @@ export default function AdminDashboard() {
   const currentData = getPaginatedData();
   const pageNumbers = getPageNumbers();
 
-  // Tính số lượng xe vào và ra hôm nay
-  const entriesCount = recentActivity.filter(
-    (record) => record.eventType === "ENTRY"
-  ).length;
-  const exitsCount = recentActivity.filter(
-    (record) => record.eventType === "EXIT"
-  ).length;
-
   return (
-    <div className="container mx-auto px-4 py-6 max-w-full">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold mb-2">Dashboard</h1>
-        <p className="text-gray-500">
-          Tổng quan tình hình bãi đỗ xe ngày {today}
-        </p>
-        {error && (
-          <div className="mt-4 p-4 rounded-lg bg-red-50 border border-red-200">
-            <p className="text-red-600 font-medium flex items-center">
-              <span className="mr-2">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="16"
-                  height="16"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <circle cx="12" cy="12" r="10"></circle>
-                  <line x1="12" y1="8" x2="12" y2="12"></line>
-                  <line x1="12" y1="16" x2="12.01" y2="16"></line>
-                </svg>
-              </span>
-              {error}
-            </p>
-          </div>
-        )}
+    <div className="w-full px-4 py-6">
+      {/* Header với breadcrumb */}
+      <div className="mb-8 flex justify-between items-start">
+        <div>
+          <h1 className="text-3xl font-bold mb-2">Dashboard</h1>
+          <p className="text-gray-500">
+            Tổng quan tình hình bãi đỗ xe ngày {today}
+          </p>
+        </div>
+
+        <div className="flex items-center gap-2 bg-slate-100 rounded-lg px-4 py-2">
+          <Calendar className="h-4 w-4 text-slate-500" />
+          <span className="text-slate-600 font-medium">
+            {new Date().toLocaleDateString("vi-VN")}
+          </span>
+          <TimerIcon className="h-4 w-4 text-slate-500 ml-2" />
+          <span className="text-slate-600 font-medium" id="live-time">
+            {new Date().toLocaleTimeString("vi-VN")}
+          </span>
+        </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        {/* Thống kê tổng số xe */}
-        <Card className="shadow-sm hover:shadow-md transition-shadow duration-300">
+      {/* Hiển thị lỗi */}
+      {error && (
+        <div className="mt-4 p-4 rounded-lg bg-red-50 border border-red-200 mb-8">
+          <p className="text-red-600 font-medium flex items-center">
+            <span className="mr-2">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="12" y1="8" x2="12" y2="12"></line>
+                <line x1="12" y1="16" x2="12.01" y2="16"></line>
+              </svg>
+            </span>
+            {error}
+          </p>
+        </div>
+      )}
+
+      {/* Grid layout cho thống kê */}
+      <div className="grid grid-cols-12 gap-6 mb-8">
+        {/* Thống kê tổng số xe - chiếm 3/12 */}
+        <Card className="col-span-12 sm:col-span-6 lg:col-span-3 shadow-sm hover:shadow-md transition-shadow duration-300">
           <CardHeader className="pb-2 flex flex-row items-center justify-between space-y-0">
-            <CardTitle className="text-sm font-medium">
+            <CardTitle className="text-m font-medium">
               Tổng số xe hiện tại
             </CardTitle>
-            <Users className="h-4 w-4 text-muted-foreground" />
+            <div className="p-2 rounded-full bg-slate-100">
+              <Users className="h-4 w-4 text-slate-600" />
+            </div>
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold">{currentStats?.total || 0}</div>
-            <p className="text-xs text-muted-foreground mt-1">
-              Số xe đang có trong bãi
-            </p>
+            <div className="text-4xl font-bold mb-5">
+              {currentStats?.total || 0}
+            </div>
+            <div className="flex items-center justify-between">
+              <p className="text-xs text-muted-foreground">
+                Số xe đang có trong bãi
+              </p>
+              <div className="text-xs font-medium bg-slate-100 rounded-full px-2 py-0.5">
+                {entriesCount - exitsCount > 0 ? "+" : ""}
+                {entriesCount - exitsCount} hôm nay
+              </div>
+            </div>
           </CardContent>
         </Card>
 
-        {/* Thống kê xe máy */}
-        <Card className="shadow-sm hover:shadow-md transition-shadow duration-300">
+        {/* Thống kê xe máy - chiếm 3/12 */}
+        <Card className="col-span-12 sm:col-span-6 lg:col-span-3 shadow-sm hover:shadow-md transition-shadow duration-300">
           <CardHeader className="pb-2 flex flex-row items-center justify-between space-y-0">
-            <CardTitle className="text-sm font-medium">Xe máy</CardTitle>
-            <div className="p-1 rounded-full bg-blue-100">
+            <CardTitle className="text-m font-medium">Xe máy</CardTitle>
+            <div className="p-2 rounded-full bg-blue-100">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 width="16"
@@ -340,24 +188,32 @@ export default function AdminDashboard() {
             </div>
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold text-blue-600">
+            <div className="text-4xl font-bold text-blue-600 mb-5">
               {currentStats?.motorbike || 0}
             </div>
-            <p className="text-xs text-muted-foreground mt-1">
-              {entriesCount > 0 && (
-                <span className="text-green-600 mr-1 flex items-center text-xs gap-0.5">
-                  <TrendingUp className="h-3 w-3" /> {entriesCount} vào
-                </span>
-              )}
-            </p>
+            <div className="flex items-center justify-between">
+              {/* Số lượng xe vào bên trái */}
+              <span className="text-green-600 flex items-center text-xs gap-0.5 bg-green-50 rounded-full px-2 py-0.5">
+                <TrendingUp className="h-3 w-3" />
+                {getVehicleTypeCount("Motorbike", "ENTRY")}{" "}
+                vào
+              </span>
+
+              {/* Số lượng xe ra bên phải */}
+              <span className="text-red-600 flex items-center text-xs gap-0.5 bg-red-50 rounded-full px-2 py-0.5">
+                <TrendingDown className="h-3 w-3" />
+                {getVehicleTypeCount("Motorbike", "EXIT")}{" "}
+                ra
+              </span>
+            </div>
           </CardContent>
         </Card>
 
-        {/* Thống kê xe tay ga */}
-        <Card className="shadow-sm hover:shadow-md transition-shadow duration-300">
+        {/* Thống kê xe tay ga - chiếm 3/12 */}
+        <Card className="col-span-12 sm:col-span-6 lg:col-span-3 shadow-sm hover:shadow-md transition-shadow duration-300">
           <CardHeader className="pb-2 flex flex-row items-center justify-between space-y-0">
-            <CardTitle className="text-sm font-medium">Xe tay ga</CardTitle>
-            <div className="p-1 rounded-full bg-green-100">
+            <CardTitle className="text-m font-medium">Xe tay ga</CardTitle>
+            <div className="p-2 rounded-full bg-green-100">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 width="16"
@@ -378,24 +234,32 @@ export default function AdminDashboard() {
             </div>
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold text-green-600">
+            <div className="text-4xl font-bold text-green-600 mb-5">
               {currentStats?.scooter || 0}
             </div>
-            <p className="text-xs text-muted-foreground mt-1">
-              {exitsCount > 0 && (
-                <span className="text-red-600 mr-1 flex items-center text-xs gap-0.5">
-                  <TrendingDown className="h-3 w-3" /> {exitsCount} ra
-                </span>
-              )}
-            </p>
+            <div className="flex items-center justify-between">
+              {/* Số lượng xe vào bên trái */}
+              <span className="text-green-600 flex items-center text-xs gap-0.5 bg-green-50 rounded-full px-2 py-0.5">
+                <TrendingUp className="h-3 w-3" />
+                {getVehicleTypeCount("Scooter", "ENTRY")}{" "}
+                vào
+              </span>
+
+              {/* Số lượng xe ra bên phải */}
+              <span className="text-red-600 flex items-center text-xs gap-0.5 bg-red-50 rounded-full px-2 py-0.5">
+                <TrendingDown className="h-3 w-3" />
+                {getVehicleTypeCount("Scooter", "EXIT")}{" "}
+                ra
+              </span>
+            </div>
           </CardContent>
         </Card>
 
-        {/* Thống kê xe đạp */}
-        <Card className="shadow-sm hover:shadow-md transition-shadow duration-300">
+        {/* Thống kê xe đạp - chiếm 3/12 */}
+        <Card className="col-span-12 sm:col-span-6 lg:col-span-3 shadow-sm hover:shadow-md transition-shadow duration-300">
           <CardHeader className="pb-2 flex flex-row items-center justify-between space-y-0">
-            <CardTitle className="text-sm font-medium">Xe đạp</CardTitle>
-            <div className="p-1 rounded-full bg-yellow-100">
+            <CardTitle className="text-m font-medium">Xe đạp</CardTitle>
+            <div className="p-2 rounded-full bg-yellow-100">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 width="16"
@@ -415,26 +279,38 @@ export default function AdminDashboard() {
             </div>
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold text-yellow-600">
+            <div className="text-4xl font-bold text-yellow-600 mb-5">
               {currentStats?.bicycle || 0}
             </div>
-            <p className="text-xs text-muted-foreground mt-1">
-              {/* Có thể hiển thị thêm thông tin nếu cần */}
-              &nbsp;
-            </p>
+            <div className="flex items-center justify-between">
+              {/* Số lượng xe vào bên trái */}
+              <span className="text-green-600 flex items-center text-xs gap-0.5 bg-green-50 rounded-full px-2 py-0.5">
+                <TrendingUp className="h-3 w-3" />
+                {getVehicleTypeCount("Bicycle", "ENTRY")}{" "}
+                vào
+              </span>
+
+              {/* Số lượng xe ra bên phải */}
+              <span className="text-red-600 flex items-center text-xs gap-0.5 bg-red-50 rounded-full px-2 py-0.5">
+                <TrendingDown className="h-3 w-3" />
+                {getVehicleTypeCount("Bicycle", "EXIT")}{" "}
+                ra
+              </span>
+            </div>
           </CardContent>
         </Card>
       </div>
 
+      {/* Bảng hoạt động */}
       <Card className="shadow-sm hover:shadow-md transition-shadow duration-300">
         <CardHeader className="flex flex-row items-start justify-between border-b pb-4">
           <div>
             <CardTitle className="text-lg font-bold flex items-center gap-2">
               <Activity className="h-5 w-5" />
-              Hoạt động gần đây
+              Lượt ra vào gần đây
             </CardTitle>
             <CardDescription className="mt-1">
-              Các xe ra/vào bãi gần đây nhất ({recentActivity.length} hoạt động)
+              Các xe ra/vào bãi trong ngày ({entriesCount + exitsCount} lượt)
             </CardDescription>
           </div>
         </CardHeader>
@@ -443,19 +319,22 @@ export default function AdminDashboard() {
             <Table>
               <TableHeader>
                 <TableRow className="bg-slate-50 dark:bg-slate-800">
-                  <TableHead className="font-medium text-center py-3 pl-6">
-                    Biển số xe
+                  <TableHead className="font-medium w-[5%] text-center py-3">
+                    STT
                   </TableHead>
-                  <TableHead className="font-medium text-center py-3">
+                  <TableHead className="font-medium w-[20%] text-center py-3 pl-6">
+                    Biển số/Identifier
+                  </TableHead>
+                  <TableHead className="font-medium w-[15%] text-center py-3">
                     Loại xe
                   </TableHead>
-                  <TableHead className="font-medium text-center py-3">
+                  <TableHead className="font-medium w-[25%] text-center py-3">
                     Thời gian
                   </TableHead>
-                  <TableHead className="font-medium text-center py-3">
+                  <TableHead className="font-medium w-[15%] text-center py-3">
                     Loại vé
                   </TableHead>
-                  <TableHead className="font-medium text-center py-3 pr-6">
+                  <TableHead className="font-medium w-[20%] text-center py-3 pr-6">
                     Trạng thái
                   </TableHead>
                 </TableRow>
@@ -464,7 +343,7 @@ export default function AdminDashboard() {
                 {currentData.length === 0 ? (
                   <TableRow>
                     <TableCell
-                      colSpan={5}
+                      colSpan={6}
                       className="text-center py-8 text-muted-foreground"
                     >
                       <div className="flex flex-col items-center justify-center">
@@ -486,6 +365,9 @@ export default function AdminDashboard() {
                           : "bg-slate-50/50 dark:bg-slate-900/50"
                       }
                     >
+                      <TableCell className="text-center text-slate-500">
+                        {(currentPage - 1) * 5 + index + 1}
+                      </TableCell>
                       <TableCell className="font-medium text-center pl-6">
                         {record.licensePlate}
                       </TableCell>

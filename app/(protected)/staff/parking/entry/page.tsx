@@ -40,6 +40,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { useFetchWithAuth } from "@/hooks/use-fetch-with-auth";
 
 // Định nghĩa interface cho loại xe
 interface VehicleType {
@@ -47,8 +48,14 @@ interface VehicleType {
   name: string;
 }
 
+interface VehicleTypesResponse {
+  code: number;
+  message?: string;
+  result?: VehicleType[];
+}
+
 // Định nghĩa interface cho kết quả API
-interface ApiResponse {
+interface EntryResponse {
   code: number;
   message?: string;
   result?: {
@@ -69,7 +76,7 @@ interface ApiResponse {
   };
 }
 
-// Định nghĩa schema xác thực form dùng Zod
+// Định nghĩa schema xác thực form dùng Zod (giữ nguyên)
 const formSchema = z
   .object({
     licensePlate: z
@@ -113,15 +120,18 @@ const formSchema = z
 type FormValues = z.infer<typeof formSchema>;
 
 export default function VehicleEntryPage() {
+  // Sử dụng hook useFetchWithAuth
+  const { fetchWithAuth, loading: apiLoading } = useFetchWithAuth();
+
   const [vehicleTypes, setVehicleTypes] = useState<VehicleType[]>([]);
   const [loading, setLoading] = useState(false);
   const [fetchingTypes, setFetchingTypes] = useState(true);
   const [showSuccessDialog, setShowSuccessDialog] = useState(false);
-  const [entryRecord, setEntryRecord] = useState<ApiResponse["result"] | null>(
+  const [entryRecord, setEntryRecord] = useState<EntryResponse["result"] | null>(
     null
   );
 
-  // Khởi tạo form
+  // Khởi tạo form (giữ nguyên)
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -133,12 +143,12 @@ export default function VehicleEntryPage() {
     mode: "onChange",
   });
 
-  // Xử lý khi một trường thay đổi để kiểm tra logic
+  // Watch fields (giữ nguyên)
   const watchLicensePlate = form.watch("licensePlate");
   const watchIdentifier = form.watch("identifier");
 
+  // useEffects cho watch fields (giữ nguyên)
   useEffect(() => {
-    // Nếu người dùng nhập biển số, xóa identifier và ngược lại
     if (watchLicensePlate && form.getValues("identifier")) {
       form.setValue("identifier", "");
     }
@@ -150,59 +160,39 @@ export default function VehicleEntryPage() {
     }
   }, [watchIdentifier, form]);
 
-  // Thêm xử lý để xóa lỗi khi chuyển sang trường khác
-
   useEffect(() => {
-    // Nếu người dùng nhập biển số, xóa identifier và xóa lỗi ở cả hai trường
     if (watchLicensePlate) {
       if (form.getValues("identifier")) {
         form.setValue("identifier", "");
       }
-      // Xóa lỗi khi có nhập liệu
       form.clearErrors("licensePlate");
       form.clearErrors("identifier");
     }
   }, [watchLicensePlate, form]);
 
   useEffect(() => {
-    // Nếu người dùng nhập identifier, xóa biển số và xóa lỗi ở cả hai trường
     if (watchIdentifier) {
       if (form.getValues("licensePlate")) {
         form.setValue("licensePlate", "");
       }
-      // Xóa lỗi khi có nhập liệu
       form.clearErrors("licensePlate");
       form.clearErrors("identifier");
     }
   }, [watchIdentifier, form]);
 
-  // Fetch danh sách loại xe từ API
+  // Refactor: Fetch danh sách loại xe từ API sử dụng fetchWithAuth
   useEffect(() => {
     const fetchVehicleTypes = async () => {
       try {
-        const token = localStorage.getItem("token");
-        if (!token) {
-          toast.error("Bạn chưa đăng nhập hoặc phiên làm việc đã hết hạn");
-          setFetchingTypes(false);
-          return;
-        }
+        setFetchingTypes(true);
 
-        // Cập nhật URL endpoint theo hướng dẫn của bạn
-        const response = await fetch(
-          "http://localhost:8080/api/parking/vehicle-types",
-          {
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
-            },
-          }
+        const data = await fetchWithAuth<VehicleTypesResponse>(
+          "http://localhost:8080/api/parking/vehicle-types"
         );
 
-        if (!response.ok) {
-          throw new Error(`HTTP error! Status: ${response.status}`);
-        }
+        // Nếu data là null (có lỗi 401), không cần xử lý tiếp
+        if (!data) return;
 
-        const data = await response.json();
         if (data.code === 1000 && data.result) {
           setVehicleTypes(data.result);
 
@@ -222,18 +212,12 @@ export default function VehicleEntryPage() {
     };
 
     fetchVehicleTypes();
-  }, [form]);
+  }, [form, fetchWithAuth]);
 
-  // Xử lý submit form
+  // Refactor: Xử lý submit form sử dụng fetchWithAuth
   const onSubmit = async (values: FormValues) => {
     try {
       setLoading(true);
-
-      const token = localStorage.getItem("token");
-      if (!token) {
-        toast.error("Bạn chưa đăng nhập hoặc phiên làm việc đã hết hạn");
-        return;
-      }
 
       // Chuẩn bị dữ liệu gửi lên server
       const requestBody = {
@@ -243,19 +227,19 @@ export default function VehicleEntryPage() {
         cardId: values.cardId ? values.cardId : "",
       };
 
-      const response = await fetch("http://localhost:8080/api/parking/entry", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(requestBody),
-      });
+      const data = await fetchWithAuth<EntryResponse>(
+        "http://localhost:8080/api/parking/entry",
+        {
+          method: "POST",
+          body: JSON.stringify(requestBody),
+        }
+      );
 
-      const data: ApiResponse = await response.json();
+      // Nếu data là null (có lỗi 401), không cần xử lý tiếp
+      if (!data) return;
 
-      if (!response.ok) {
-        // Xử lý các mã lỗi cụ thể
+      // Xử lý các mã lỗi cụ thể
+      if (data.code !== 1000) {
         if (data.code === 4006) {
           form.setError("licensePlate", {
             type: "manual",
@@ -275,18 +259,18 @@ export default function VehicleEntryPage() {
           });
           toast.error("Thẻ này đã được sử dụng cho xe khác");
         } else {
-          toast.error(data.message || `Lỗi: ${response.status}`);
+          toast.error(data.message || "Lỗi không xác định");
         }
         return;
       }
 
       // Xử lý khi request thành công
-      if (data.code === 1000 && data.result) {
+      if (data.result) {
         setEntryRecord(data.result);
         setShowSuccessDialog(true);
         form.reset(); // Reset form sau khi thành công
       } else {
-        toast.error(data.message || "Ghi nhận xe vào bãi thất bại");
+        toast.error("Ghi nhận xe vào bãi thất bại");
       }
     } catch (error) {
       console.error("Error submitting form:", error);
@@ -299,10 +283,10 @@ export default function VehicleEntryPage() {
   const handleNewEntry = () => {
     setShowSuccessDialog(false);
     setEntryRecord(null);
-    // Form đã được reset trong onSubmit
   };
 
-  if (fetchingTypes) {
+  // Cập nhật loading state để kết hợp cả loading từ form và từ API
+  if (fetchingTypes || apiLoading) {
     return (
       <div className="flex justify-center items-center h-64">
         <Loader2 className="h-8 w-8 animate-spin text-primary" />
@@ -310,6 +294,7 @@ export default function VehicleEntryPage() {
     );
   }
 
+  // Phần return UI vẫn giữ nguyên
   return (
     <div className="max-w-2xl mx-auto p-4">
       <Card>
@@ -322,6 +307,7 @@ export default function VehicleEntryPage() {
         <CardContent>
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+              {/* Form fields giữ nguyên */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <FormField
                   control={form.control}
@@ -419,8 +405,12 @@ export default function VehicleEntryPage() {
                 />
               </div>
 
-              <Button type="submit" className="w-full" disabled={loading}>
-                {loading ? (
+              <Button
+                type="submit"
+                className="w-full"
+                disabled={loading || apiLoading} // Thêm apiLoading
+              >
+                {loading || apiLoading ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                     Đang xử lý...
@@ -437,7 +427,7 @@ export default function VehicleEntryPage() {
         </CardContent>
       </Card>
 
-      {/* Dialog thông báo thành công */}
+      {/* Dialog thông báo thành công giữ nguyên */}
       <AlertDialog open={showSuccessDialog} onOpenChange={setShowSuccessDialog}>
         <AlertDialogContent>
           <AlertDialogHeader>
