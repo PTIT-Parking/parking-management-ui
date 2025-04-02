@@ -118,7 +118,7 @@ const StaffSidebar = () => {
                   Đăng ký thẻ tháng
                 </div>
               </Link>
-              <Link href="/staff/monthly/list">
+              <Link href="/staff/monthly/list-registration">
                 <div
                   className={cn(
                     "flex w-full items-center py-2 text-sm transition-all hover:bg-slate-100 rounded-md",

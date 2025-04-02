@@ -316,6 +316,7 @@ export default function VehicleEntryPage() {
                           // Thêm sự kiện onFocus để xóa lỗi khi click vào
                           onFocus={() => {
                             form.clearErrors("licensePlate");
+                            form.clearErrors("identifier");
                           }}
                         />
                       </FormControl>
@@ -343,12 +344,11 @@ export default function VehicleEntryPage() {
                           }}
                           onFocus={() => {
                             form.clearErrors("identifier");
+                            form.clearErrors("licensePlate");
                           }}
                         />
                       </FormControl>
                       <div className="min-h-[20px]">
-                        {" "}
-                        {/* Khoảng trống cố định cho thông báo lỗi */}
                         <FormMessage />
                       </div>
                     </FormItem>

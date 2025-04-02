@@ -65,15 +65,18 @@ const formSchema = z
   .object({
     licensePlate: z.string().optional().or(z.literal("")),
     identifier: z.string().optional().or(z.literal("")),
-    cardId: z.string().refine(
-      (val) => {
-        const num = parseInt(val);
-        return !isNaN(num) && num >= 1 && num <= 999;
-      },
-      {
-        message: "Mã số thẻ phải là số nguyên từ 1-999",
-      }
-    ),
+    cardId: z
+      .string()
+      .min(1, "Mã số thẻ không được để trống")
+      .refine(
+        (val) => {
+          const num = parseInt(val);
+          return !isNaN(num) && num >= 1 && num <= 999;
+        },
+        {
+          message: "Mã số thẻ phải là số nguyên từ 1-999",
+        }
+      ),
   })
   .refine((data) => data.licensePlate || data.identifier, {
     message: "Vui lòng nhập biển số xe hoặc identifier",
@@ -194,7 +197,6 @@ export default function VehicleExitPage() {
             type: "manual",
             message: "Mã số thẻ không được để trống",
           });
-          setErrorMessage("Vui lòng nhập mã số thẻ");
         } else if (
           !form.getValues("licensePlate") &&
           !form.getValues("identifier")
@@ -203,17 +205,16 @@ export default function VehicleExitPage() {
             type: "manual",
             message: "Vui lòng nhập biển số xe hoặc identifier",
           });
-          setErrorMessage("Vui lòng nhập biển số xe hoặc identifier");
         } else {
           setErrorMessage(
             "Dữ liệu không hợp lệ. Vui lòng kiểm tra lại thông tin nhập."
           );
+          setShowErrorDialog(true);
         }
       } else {
         setErrorMessage("Đã xảy ra lỗi khi ghi nhận xe ra bãi");
+        setShowErrorDialog(true);
       }
-
-      setShowErrorDialog(true);
     } finally {
       setLoading(false);
     }
@@ -265,8 +266,15 @@ export default function VehicleExitPage() {
                           placeholder="Ví dụ: 59A-12345"
                           {...field}
                           disabled={!!watchIdentifier || isLoading}
+                          onChange={(e) => {
+                            field.onChange(e);
+                            if (form.formState.errors.licensePlate) {
+                              form.clearErrors("licensePlate");
+                            }
+                          }}
                           onFocus={() => {
                             form.clearErrors("licensePlate");
+                            form.clearErrors("identifier");
                           }}
                         />
                       </FormControl>
@@ -288,8 +296,15 @@ export default function VehicleExitPage() {
                           placeholder="Nhập ID nếu không có biển số"
                           {...field}
                           disabled={!!watchLicensePlate || isLoading}
+                          onChange={(e) => {
+                            field.onChange(e);
+                            if (form.formState.errors.identifier) {
+                              form.clearErrors("identifier");
+                            }
+                          }}
                           onFocus={() => {
                             form.clearErrors("identifier");
+                            form.clearErrors("licensePlate");
                           }}
                         />
                       </FormControl>
@@ -314,6 +329,12 @@ export default function VehicleExitPage() {
                           min={1}
                           max={999}
                           disabled={isLoading}
+                          onChange={(e) => {
+                            field.onChange(e);
+                            if (form.formState.errors.cardId) {
+                              form.clearErrors("cardId");
+                            }
+                          }}
                           onFocus={() => {
                             form.clearErrors("cardId");
                           }}
