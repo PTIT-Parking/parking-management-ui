@@ -16,8 +16,8 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
-import { toast } from "sonner";
 import { Eye, EyeOff } from "lucide-react";
+import { useAuth } from "@/hooks/use-auth";
 
 const formSchema = z.object({
   username: z.string().min(1, {
@@ -28,18 +28,9 @@ const formSchema = z.object({
   }),
 });
 
-interface ApiResponse {
-  code: number;
-  message?: string;
-  result?: {
-    token: string;
-    username: string;
-    role: string;
-  };
-}
-
 const LoginForm = () => {
   const router = useRouter();
+  const { login, error: authError } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [loginError, setLoginError] = useState<string | null>(null);
@@ -57,61 +48,25 @@ const LoginForm = () => {
       setIsLoading(true);
       setLoginError(null);
 
-      const response = await fetch("http://localhost:8080/api/auth/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          username: data.username,
-          password: data.password,
-        }),
-      });
-      
-      const responseData: ApiResponse = await response.json();
+      // Sử dụng login từ useAuth
+      const response = await login(data.username, data.password);
 
-      // Xử lý các mã code từ API
-      switch (responseData.code) {
-        case 1000:
-          // Đăng nhập thành công
-          if (responseData.result) {
-            const { token, username, role } = responseData.result;
-            
-            // Lưu token vào localStorage
-            localStorage.setItem("token", token);
-            localStorage.setItem("userRole", role);
-            localStorage.setItem("username", username);
-            
-            toast.success("Đăng nhập thành công!");
-            
-            // Điều hướng dựa theo vai trò
-            if (role === "ADMIN") {
-              router.push("/admin/dashboard");
-            } else {
-              router.push("/staff/dashboard");
-            }
-          } else {
-            throw new Error("Phản hồi không hợp lệ từ server");
-          }
-          break;
-          
-        case 1001:
-          // Tên đăng nhập hoặc mật khẩu không đúng
-          setLoginError("Sai tên đăng nhập hoặc mật khẩu");
-          toast.error("Đăng nhập thất bại");
-          break;
-          
-        default:
-          // Các lỗi khác
-          setLoginError(responseData.message || "Đăng nhập không thành công");
-          toast.error("Đăng nhập thất bại");
+      // Kiểm tra kết quả
+      if (response && response.code === 1000) {
+        
+        // Điều hướng dựa theo vai trò
+        const userRole = response.result?.role;
+        if (userRole === "ADMIN") {
+          router.push("/admin/dashboard");
+        } else {
+          router.push("/staff/dashboard");
+        }
       }
     } catch (error) {
       console.error("Login error: ", error);
       setLoginError(
         error instanceof Error ? error.message : "Đã xảy ra lỗi khi đăng nhập"
       );
-      toast.error("Đăng nhập thất bại");
     } finally {
       setIsLoading(false);
     }
@@ -127,9 +82,9 @@ const LoginForm = () => {
         Log in
       </CardHeader>
       <CardContent className="space-y-4">
-        {loginError && (
+        {(loginError || authError) && (
           <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
-            {loginError}
+            {loginError || authError}
           </div>
         )}
 

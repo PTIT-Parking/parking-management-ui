@@ -268,28 +268,28 @@ export default function ListActiveMonthlyCards() {
       {/* Thống kê tổng quan */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
         <Card>
-          <CardContent className="flex items-center justify-between pt-6">
+          <CardContent className="flex items-center justify-between pt-3">
             <div className="flex items-center">
               <div className="p-2 rounded-full bg-blue-100 mr-4">
                 <CreditCard className="h-5 w-5 text-blue-600" />
               </div>
               <div>
-                <p className="text-sm text-muted-foreground">Tổng số thẻ</p>
-                <p className="text-2xl font-bold">{cards.length}</p>
+                <p className="text-m text-muted-foreground">Tổng số thẻ</p>
+                <p className="text-3xl font-bold">{cards.length}</p>
               </div>
             </div>
           </CardContent>
         </Card>
 
         <Card>
-          <CardContent className="flex items-center justify-between pt-6">
+          <CardContent className="flex items-center justify-between pt-3">
             <div className="flex items-center">
               <div className="p-2 rounded-full bg-purple-100 mr-4">
                 <User className="h-5 w-5 text-purple-600" />
               </div>
               <div>
-                <p className="text-sm text-muted-foreground">Giảng viên</p>
-                <p className="text-2xl font-bold">
+                <p className="text-m text-muted-foreground">Giảng viên</p>
+                <p className="text-3xl font-bold">
                   {
                     cards.filter(
                       (card) => card.customer.customerType === "LECTURER"
@@ -302,14 +302,14 @@ export default function ListActiveMonthlyCards() {
         </Card>
 
         <Card>
-          <CardContent className="flex items-center justify-between pt-6">
+          <CardContent className="flex items-center justify-between pt-3">
             <div className="flex items-center">
               <div className="p-2 rounded-full bg-cyan-100 mr-4">
                 <User className="h-5 w-5 text-cyan-600" />
               </div>
               <div>
-                <p className="text-sm text-muted-foreground">Sinh viên</p>
-                <p className="text-2xl font-bold">
+                <p className="text-m text-muted-foreground">Sinh viên</p>
+                <p className="text-3xl font-bold">
                   {
                     cards.filter(
                       (card) => card.customer.customerType === "STUDENT"
@@ -584,184 +584,200 @@ export default function ListActiveMonthlyCards() {
                 <TabsTrigger value="vehicle">Thông tin xe</TabsTrigger>
                 <TabsTrigger value="card">Thông tin thẻ</TabsTrigger>
               </TabsList>
-              <TabsContent value="customer" className="space-y-4">
-                <div className="grid grid-cols-2 gap-3">
-                  <div className="space-y-1">
-                    <p className="text-sm font-medium text-gray-500">Họ tên</p>
-                    <div className="flex items-center">
-                      <User
-                        className={`h-4 w-4 mr-1.5 ${
-                          selectedCard.customer.customerType === "LECTURER"
-                            ? "text-purple-600"
-                            : "text-cyan-600"
-                        }`}
-                      />
-                      <p>{selectedCard.customer.name}</p>
+              <div className="h-[230px] overflow-y-auto">
+                <TabsContent value="customer" className="space-y-4 m-0 data-[state=inactive]:hidden">
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="space-y-1">
+                      <p className="text-sm font-medium text-gray-500">
+                        Họ tên
+                      </p>
+                      <div className="flex items-center">
+                        <User
+                          className={`h-4 w-4 mr-1.5 ${
+                            selectedCard.customer.customerType === "LECTURER"
+                              ? "text-purple-600"
+                              : "text-cyan-600"
+                          }`}
+                        />
+                        <p>{selectedCard.customer.name}</p>
+                      </div>
                     </div>
-                  </div>
-                  <div className="space-y-1">
-                    <p className="text-sm font-medium text-gray-500">
-                      Loại khách hàng
-                    </p>
-                    <Badge
-                      variant="outline"
-                      className={getCustomerTypeColor(
-                        selectedCard.customer.customerType
-                      )}
-                    >
-                      {selectedCard.customer.customerType === "LECTURER"
-                        ? "Giảng viên"
-                        : "Sinh viên"}
-                    </Badge>
-                  </div>
-                  <div className="space-y-1">
-                    <p className="text-sm font-medium text-gray-500">
-                      Giới tính
-                    </p>
-                    <p>
-                      {selectedCard.customer.gender === "MALE" ? "Nam" : "Nữ"}
-                    </p>
-                  </div>
-                  <div className="space-y-1">
-                    <p className="text-sm font-medium text-gray-500">
-                      Ngày sinh
-                    </p>
-                    <div className="flex items-center">
-                      <Calendar className="h-4 w-4 mr-1.5 text-gray-500" />
-                      <p>{formatDate(selectedCard.customer.dob)}</p>
+                    <div className="space-y-1">
+                      <p className="text-sm font-medium text-gray-500">
+                        Loại khách hàng
+                      </p>
+                      <Badge
+                        variant="outline"
+                        className={getCustomerTypeColor(
+                          selectedCard.customer.customerType
+                        )}
+                      >
+                        {selectedCard.customer.customerType === "LECTURER"
+                          ? "Giảng viên"
+                          : "Sinh viên"}
+                      </Badge>
                     </div>
-                  </div>
-                  <div className="space-y-1">
-                    <p className="text-sm font-medium text-gray-500">
-                      Số điện thoại
-                    </p>
-                    <p>{selectedCard.customer.phoneNumber}</p>
-                  </div>
-                  <div className="space-y-1">
-                    <p className="text-sm font-medium text-gray-500">Email</p>
-                    <p>{selectedCard.customer.email}</p>
-                  </div>
-                  <div className="space-y-1 col-span-2">
-                    <p className="text-sm font-medium text-gray-500">Địa chỉ</p>
-                    <p>{selectedCard.customer.address}</p>
-                  </div>
-                </div>
-              </TabsContent>
-              <TabsContent value="vehicle" className="space-y-4">
-                <div className="grid grid-cols-2 gap-3">
-                  <div className="space-y-1">
-                    <p className="text-sm font-medium text-gray-500">
-                      Biển số xe
-                    </p>
-                    <p className="font-medium">
-                      {selectedCard.vehicle.licensePlate}
-                    </p>
-                  </div>
-                  <div className="space-y-1">
-                    <p className="text-sm font-medium text-gray-500">Loại xe</p>
-                    <Badge
-                      variant="outline"
-                      className={getVehicleTypeColor(
-                        selectedCard.vehicle.type.name
-                      )}
-                    >
-                      <span className="flex items-center">
-                        {getVehicleTypeIcon(selectedCard.vehicle.type.name)}
-                        <span className="ml-1">
-                          {selectedCard.vehicle.type.name}
-                        </span>
-                      </span>
-                    </Badge>
-                  </div>
-                  <div className="space-y-1">
-                    <p className="text-sm font-medium text-gray-500">Hãng xe</p>
-                    <p>{selectedCard.vehicle.brand}</p>
-                  </div>
-                  <div className="space-y-1">
-                    <p className="text-sm font-medium text-gray-500">Màu xe</p>
-                    <div className="flex items-center gap-1.5">
-                      <div
-                        className="w-3 h-3 rounded-full border border-slate-300"
-                        style={{
-                          backgroundColor:
-                            selectedCard.vehicle.color.toLowerCase(),
-                        }}
-                      ></div>
-                      <p>{selectedCard.vehicle.color}</p>
-                    </div>
-                  </div>
-                </div>
-              </TabsContent>
-              <TabsContent value="card" className="space-y-4">
-                <div className="grid grid-cols-2 gap-3">
-                  <div className="space-y-1">
-                    <p className="text-sm font-medium text-gray-500">
-                      Ngày phát hành
-                    </p>
-                    <div className="flex items-center">
-                      <Calendar className="h-4 w-4 mr-1.5 text-gray-500" />
-                      <p>{formatDate(selectedCard.issueDate)}</p>
-                    </div>
-                  </div>
-                  <div className="space-y-1">
-                    <p className="text-sm font-medium text-gray-500">
-                      Ngày hết hạn
-                    </p>
-                    <div className="flex items-center">
-                      <Calendar className="h-4 w-4 mr-1.5 text-gray-500" />
-                      <p>{formatDate(selectedCard.expirationDate)}</p>
-                    </div>
-                  </div>
-                  <div className="space-y-1">
-                    <p className="text-sm font-medium text-gray-500">
-                      Số ngày còn lại
-                    </p>
-                    <Badge
-                      className={`${
-                        calculateRemainingDays(selectedCard.expirationDate) <= 7
-                          ? "bg-red-100 text-red-800 border border-red-200"
-                          : calculateRemainingDays(
-                              selectedCard.expirationDate
-                            ) <= 30
-                          ? "bg-yellow-100 text-yellow-800 border border-yellow-200"
-                          : "bg-green-100 text-green-800 border border-green-200"
-                      }`}
-                    >
-                      <Clock className="h-3.5 w-3.5 mr-1.5" />
-                      {calculateRemainingDays(selectedCard.expirationDate)} ngày
-                    </Badge>
-                  </div>
-                  <div className="space-y-1">
-                    <p className="text-sm font-medium text-gray-500">
-                      Giá tiền
-                    </p>
-                    <div className="flex items-center">
-                      <CreditCard className="h-4 w-4 mr-1.5 text-gray-500" />
-                      <p className="font-semibold text-green-600">
-                        {formatCurrency(selectedCard.payment.amount)}
+                    <div className="space-y-1">
+                      <p className="text-sm font-medium text-gray-500">
+                        Giới tính
+                      </p>
+                      <p>
+                        {selectedCard.customer.gender === "MALE" ? "Nam" : "Nữ"}
                       </p>
                     </div>
-                  </div>
-                  <div className="space-y-1">
-                    <p className="text-sm font-medium text-gray-500">
-                      Người tạo
-                    </p>
-                    <div className="flex items-center">
-                      <User className="h-4 w-4 mr-1.5 text-gray-500" />
-                      <p>{selectedCard.createBy.username}</p>
+                    <div className="space-y-1">
+                      <p className="text-sm font-medium text-gray-500">
+                        Ngày sinh
+                      </p>
+                      <div className="flex items-center">
+                        <Calendar className="h-4 w-4 mr-1.5 text-gray-500" />
+                        <p>{formatDate(selectedCard.customer.dob)}</p>
+                      </div>
+                    </div>
+                    <div className="space-y-1">
+                      <p className="text-sm font-medium text-gray-500">
+                        Số điện thoại
+                      </p>
+                      <p>{selectedCard.customer.phoneNumber}</p>
+                    </div>
+                    <div className="space-y-1">
+                      <p className="text-sm font-medium text-gray-500">Email</p>
+                      <p>{selectedCard.customer.email}</p>
+                    </div>
+                    <div className="space-y-1 col-span-2">
+                      <p className="text-sm font-medium text-gray-500">
+                        Địa chỉ
+                      </p>
+                      <p>{selectedCard.customer.address}</p>
                     </div>
                   </div>
-                  <div className="space-y-1">
-                    <p className="text-sm font-medium text-gray-500">
-                      Thời gian thanh toán
-                    </p>
-                    <div className="flex items-center">
-                      <Clock className="h-4 w-4 mr-1.5 text-gray-500" />
-                      <p>{formatDate(selectedCard.payment.createAt)}</p>
+                </TabsContent>
+                <TabsContent value="vehicle" className="space-y-4 m-0 data-[state=inactive]:hidden">
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="space-y-1">
+                      <p className="text-sm font-medium text-gray-500">
+                        Biển số xe
+                      </p>
+                      <p className="font-medium">
+                        {selectedCard.vehicle.licensePlate}
+                      </p>
+                    </div>
+                    <div className="space-y-1">
+                      <p className="text-sm font-medium text-gray-500">
+                        Loại xe
+                      </p>
+                      <Badge
+                        variant="outline"
+                        className={getVehicleTypeColor(
+                          selectedCard.vehicle.type.name
+                        )}
+                      >
+                        <span className="flex items-center">
+                          {getVehicleTypeIcon(selectedCard.vehicle.type.name)}
+                          <span className="ml-1">
+                            {selectedCard.vehicle.type.name}
+                          </span>
+                        </span>
+                      </Badge>
+                    </div>
+                    <div className="space-y-1">
+                      <p className="text-sm font-medium text-gray-500">
+                        Hãng xe
+                      </p>
+                      <p>{selectedCard.vehicle.brand}</p>
+                    </div>
+                    <div className="space-y-1">
+                      <p className="text-sm font-medium text-gray-500">
+                        Màu xe
+                      </p>
+                      <div className="flex items-center gap-1.5">
+                        <div
+                          className="w-3 h-3 rounded-full border border-slate-300"
+                          style={{
+                            backgroundColor:
+                              selectedCard.vehicle.color.toLowerCase(),
+                          }}
+                        ></div>
+                        <p>{selectedCard.vehicle.color}</p>
+                      </div>
                     </div>
                   </div>
-                </div>
-              </TabsContent>
+                </TabsContent>
+                <TabsContent value="card" className="space-y-4 m-0 data-[state=inactive]:hidden">
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="space-y-1">
+                      <p className="text-sm font-medium text-gray-500">
+                        Ngày phát hành
+                      </p>
+                      <div className="flex items-center">
+                        <Calendar className="h-4 w-4 mr-1.5 text-gray-500" />
+                        <p>{formatDate(selectedCard.issueDate)}</p>
+                      </div>
+                    </div>
+                    <div className="space-y-1">
+                      <p className="text-sm font-medium text-gray-500">
+                        Ngày hết hạn
+                      </p>
+                      <div className="flex items-center">
+                        <Calendar className="h-4 w-4 mr-1.5 text-gray-500" />
+                        <p>{formatDate(selectedCard.expirationDate)}</p>
+                      </div>
+                    </div>
+                    <div className="space-y-1">
+                      <p className="text-sm font-medium text-gray-500">
+                        Số ngày còn lại
+                      </p>
+                      <Badge
+                        className={`${
+                          calculateRemainingDays(selectedCard.expirationDate) <=
+                          7
+                            ? "bg-red-100 text-red-800 border border-red-200"
+                            : calculateRemainingDays(
+                                selectedCard.expirationDate
+                              ) <= 30
+                            ? "bg-yellow-100 text-yellow-800 border border-yellow-200"
+                            : "bg-green-100 text-green-800 border border-green-200"
+                        }`}
+                      >
+                        <Clock className="h-3.5 w-3.5 mr-1.5" />
+                        {calculateRemainingDays(
+                          selectedCard.expirationDate
+                        )}{" "}
+                        ngày
+                      </Badge>
+                    </div>
+                    <div className="space-y-1">
+                      <p className="text-sm font-medium text-gray-500">
+                        Giá tiền
+                      </p>
+                      <div className="flex items-center">
+                        <CreditCard className="h-4 w-4 mr-1.5 text-gray-500" />
+                        <p className="font-semibold text-green-600">
+                          {formatCurrency(selectedCard.payment.amount)}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="space-y-1">
+                      <p className="text-sm font-medium text-gray-500">
+                        Người tạo
+                      </p>
+                      <div className="flex items-center">
+                        <User className="h-4 w-4 mr-1.5 text-gray-500" />
+                        <p>{selectedCard.createBy.username}</p>
+                      </div>
+                    </div>
+                    <div className="space-y-1">
+                      <p className="text-sm font-medium text-gray-500">
+                        Thời gian thanh toán
+                      </p>
+                      <div className="flex items-center">
+                        <Clock className="h-4 w-4 mr-1.5 text-gray-500" />
+                        <p>{formatDate(selectedCard.payment.createAt)}</p>
+                      </div>
+                    </div>
+                  </div>
+                </TabsContent>
+              </div>
             </Tabs>
           )}
 

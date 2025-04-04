@@ -12,12 +12,17 @@ const StaffLayout = ({ children }: { children: React.ReactNode }) => {
           rel="stylesheet"
         />
       </head>
-      <Navbar />
-      <div className="flex">
-        <div className="hidden md:block h-[100vh] w-[300px]">
-          <StaffSidebar />
+      <div className="flex flex-col min-h-screen">
+        <Navbar />
+        <div className="flex flex-1">
+          <div className="hidden md:block w-[300px]">
+            {/* Wrapper để tạo không gian cho sidebar, chiếm vị trí trong layout */}
+            <div className="sticky top-0 max-h-screen overflow-y-auto">
+              <StaffSidebar />
+            </div>
+          </div>
+          <div className="w-full flex-1 p-5 overflow-y-auto">{children}</div>
         </div>
-        <div className="p-5 w-full">{children}</div>
       </div>
     </>
   );
