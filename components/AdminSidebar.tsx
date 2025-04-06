@@ -125,7 +125,7 @@ const AdminSidebar = () => {
                 <div
                   className={cn(
                     "flex w-full items-center py-2 text-sm transition-all hover:bg-slate-100 rounded-md",
-                    isActive("/admin/history/monthly-cards") &&
+                    isActive("/admin/history/missing-reports") &&
                       "bg-slate-100 text-slate-900 font-medium"
                   )}
                 >
