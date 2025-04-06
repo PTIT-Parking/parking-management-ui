@@ -97,17 +97,6 @@ const AdminSidebar = () => {
               </span>
             </AccordionTrigger>
             <AccordionContent className="pl-6 py-0">
-              <Link href="/admin/history/monthly-cards">
-                <div
-                  className={cn(
-                    "flex w-full items-center py-2 text-sm transition-all hover:bg-slate-100 rounded-md",
-                    isActive("/admin/history/monthly-cards") &&
-                      "bg-slate-100 text-slate-900 font-medium"
-                  )}
-                >
-                  Đăng ký thẻ tháng
-                </div>
-              </Link>
               <Link href="/admin/history/parking-records">
                 <div
                   className={cn(
@@ -119,6 +108,31 @@ const AdminSidebar = () => {
                   Xe ra vào
                 </div>
               </Link>
+
+              <Link href="/admin/history/monthly-cards">
+                <div
+                  className={cn(
+                    "flex w-full items-center py-2 text-sm transition-all hover:bg-slate-100 rounded-md",
+                    isActive("/admin/history/monthly-cards") &&
+                      "bg-slate-100 text-slate-900 font-medium"
+                  )}
+                >
+                  Đăng ký thẻ tháng
+                </div>
+              </Link>
+
+              <Link href="/admin/history/missing-reports">
+                <div
+                  className={cn(
+                    "flex w-full items-center py-2 text-sm transition-all hover:bg-slate-100 rounded-md",
+                    isActive("/admin/history/monthly-cards") &&
+                      "bg-slate-100 text-slate-900 font-medium"
+                  )}
+                >
+                  Báo cáo mất xe
+                </div>
+              </Link>
+
               <Link href="/admin/history/payments">
                 <div
                   className={cn(
