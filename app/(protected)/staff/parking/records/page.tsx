@@ -87,9 +87,9 @@ export default function ParkingRecordsPage() {
 
   // State cho tìm kiếm
   const [searchTerm, setSearchTerm] = useState("");
-  const [searchType, setSearchType] = useState<
-    "plateOrIdentifier" | "cardId"
-  >("plateOrIdentifier");
+  const [searchType, setSearchType] = useState<"plateOrIdentifier" | "cardId">(
+    "plateOrIdentifier"
+  );
   const [filteredRecords, setFilteredRecords] = useState<ParkingRecord[]>([]);
   const [isSearching, setIsSearching] = useState(false);
 
@@ -102,9 +102,13 @@ export default function ParkingRecordsPage() {
         );
 
         if (data && data.code === 1000 && data.result) {
-          setRecords(data.result);
-          setFilteredRecords(data.result);
-          setTotalPages(Math.ceil(data.result.length / ITEMS_PER_PAGE));
+          const sortedRecords = [...data.result].sort(
+            (a, b) =>
+              new Date(b.entryTime).getTime() - new Date(a.entryTime).getTime()
+          );
+          setRecords(sortedRecords);
+          setFilteredRecords(sortedRecords);
+          setTotalPages(Math.ceil(sortedRecords.length / ITEMS_PER_PAGE));
         } else if (data) {
           throw new Error(data.message || "Không thể lấy danh sách xe");
         }
@@ -116,7 +120,7 @@ export default function ParkingRecordsPage() {
     };
 
     fetchParkingRecords();
-  }, [fetchWithAuth]);  
+  }, [fetchWithAuth]);
 
   // Xử lý tìm kiếm
   useEffect(() => {
@@ -133,12 +137,14 @@ export default function ParkingRecordsPage() {
 
     const results = records.filter((record) => {
       if (searchType === "plateOrIdentifier") {
-        return record.licensePlate.toLowerCase().includes(lowercasedSearchTerm) || 
-              record.identifier.toLowerCase().includes(lowercasedSearchTerm);
+        return (
+          record.licensePlate.toLowerCase().includes(lowercasedSearchTerm) ||
+          record.identifier.toLowerCase().includes(lowercasedSearchTerm)
+        );
       } else if (searchType === "cardId") {
         return record.cardId.toString().includes(lowercasedSearchTerm);
       }
-  
+
       return false;
     });
 
@@ -313,16 +319,16 @@ export default function ParkingRecordsPage() {
               <Select
                 value={searchType}
                 onValueChange={(value) =>
-                  setSearchType(
-                    value as "plateOrIdentifier" | "cardId"
-                  )
+                  setSearchType(value as "plateOrIdentifier" | "cardId")
                 }
               >
                 <SelectTrigger className="w-full md:w-[170px] h-10">
                   <SelectValue placeholder="Tìm theo" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="plateOrIdentifier">Biển số/Identifier</SelectItem>
+                  <SelectItem value="plateOrIdentifier">
+                    Biển số/Identifier
+                  </SelectItem>
                   <SelectItem value="cardId">Card ID</SelectItem>
                 </SelectContent>
               </Select>
@@ -351,9 +357,15 @@ export default function ParkingRecordsPage() {
                   <TableHead className="font-medium w-[15%] text-center">
                     Biển số/Identifier
                   </TableHead>
-                  <TableHead className="font-medium w-[15%] text-center">Loại xe</TableHead>
-                  <TableHead className="font-medium w-[5%] text-center">Card ID</TableHead>
-                  <TableHead className="font-medium w-[15%] text-center">Loại vé</TableHead>
+                  <TableHead className="font-medium w-[15%] text-center">
+                    Loại xe
+                  </TableHead>
+                  <TableHead className="font-medium w-[5%] text-center">
+                    Card ID
+                  </TableHead>
+                  <TableHead className="font-medium w-[15%] text-center">
+                    Loại vé
+                  </TableHead>
                   <TableHead className="font-medium w-[15%] text-center">
                     Thời gian vào
                   </TableHead>
@@ -415,7 +427,9 @@ export default function ParkingRecordsPage() {
                           {record.vehicleType.name}
                         </div>
                       </TableCell>
-                      <TableCell className="text-center">{record.cardId}</TableCell>
+                      <TableCell className="text-center">
+                        {record.cardId}
+                      </TableCell>
                       <TableCell>
                         <div className="flex justify-center">
                           {record.type === "MONTHLY" ? (

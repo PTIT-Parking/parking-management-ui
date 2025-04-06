@@ -25,15 +25,16 @@ const Navbar = () => {
   const displayName = user?.username || "Tài khoản";
 
   // Xác định đường dẫn dashboard theo role
-  const dashboardUrl = user?.role === "ADMIN" 
-    ? "/admin/dashboard" 
-    : "/staff/dashboard";
+  const dashboardUrl =
+    user?.role === "ADMIN" ? "/admin/dashboard" : "/staff/dashboard";
+
+  const staffProfileUrl = "/staff/my-info";
 
   const handleLogout = async () => {
     try {
       await logout();
       toast.success("Đăng xuất thành công");
-      router.push("/login");
+      router.replace("/login");
     } catch (error) {
       console.error("Lỗi khi đăng xuất:", error);
       toast.error("Đã xảy ra lỗi khi đăng xuất");
@@ -46,10 +47,10 @@ const Navbar = () => {
         <Image src={logo} alt="Ptit Parking" width={100} height={40} priority />
       </Link>
 
-      <div className="flex items-center gap-4">
+      <div className="flex items-center">
         <ThemeToggler />
         <DropdownMenu>
-          <DropdownMenuTrigger className="flex items-center gap-2 focus:outline-none hover:bg-primary-600/20 py-1 px-2 rounded-md transition-colors hover:text-gray-400">
+          <DropdownMenuTrigger className="flex items-center focus:outline-none hover:bg-primary-600/20 py-1 px-2 rounded-md transition-colors hover:text-gray-400">
             <div className="h-8 w-8 rounded-full bg-primary-600/30 flex items-center justify-center">
               <User className="h-5 w-5" />
             </div>
@@ -69,14 +70,17 @@ const Navbar = () => {
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuItem>
-              <Link href="/profile" className="w-full flex items-center">
+              <Link href={staffProfileUrl} className="w-full flex items-center">
                 <UserCircle className="mr-2 h-4 w-4" />
                 <span>Hồ sơ cá nhân</span>
               </Link>
             </DropdownMenuItem>
             {user?.role === "ADMIN" && (
               <DropdownMenuItem>
-                <Link href="/admin/dashboard" className="w-full flex items-center">
+                <Link
+                  href="/admin/dashboard"
+                  className="w-full flex items-center"
+                >
                   <Settings className="mr-2 h-4 w-4" />
                   <span>Quản trị hệ thống</span>
                 </Link>

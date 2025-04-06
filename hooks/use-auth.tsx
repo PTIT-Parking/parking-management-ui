@@ -6,6 +6,7 @@ import {
   useEffect,
   useState,
   ReactNode,
+  useCallback,
 } from "react";
 import Cookies from "js-cookie";
 
@@ -49,11 +50,14 @@ export function AuthProvider({ children }: Readonly<{ children: ReactNode }>) {
   const [error, setError] = useState<string | null>(null);
 
   // Lấy thông tin người dùng từ API
-  const refreshUserInfo = async () => {
+  const refreshUserInfo = useCallback(async () => {
     try {
       const token = Cookies.get("authToken");
       if (!token) return;
 
+      if (loading) return;
+
+      setLoading(true);
       const response = await fetch("http://localhost:8080/api/auth/my-info", {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -81,8 +85,10 @@ export function AuthProvider({ children }: Readonly<{ children: ReactNode }>) {
     } catch (error) {
       console.error("Error fetching user info:", error);
       // Không throw lỗi ở đây để không làm gián đoạn luồng đăng nhập
+    } finally {
+      setLoading(false);
     }
-  };
+  }, [loading]);
 
   // Kiểm tra và lấy thông tin người dùng khi component được mount
   useEffect(() => {
