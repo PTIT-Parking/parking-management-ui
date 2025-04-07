@@ -75,17 +75,6 @@ const Navbar = () => {
                 <span>Hồ sơ cá nhân</span>
               </Link>
             </DropdownMenuItem>
-            {user?.role === "ADMIN" && (
-              <DropdownMenuItem>
-                <Link
-                  href="/admin/dashboard"
-                  className="w-full flex items-center"
-                >
-                  <Settings className="mr-2 h-4 w-4" />
-                  <span>Quản trị hệ thống</span>
-                </Link>
-              </DropdownMenuItem>
-            )}
             <DropdownMenuSeparator />
             <DropdownMenuItem
               className="text-red-500 cursor-pointer focus:text-red-500 focus:bg-red-50"

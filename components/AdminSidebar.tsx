@@ -147,43 +147,18 @@ const AdminSidebar = () => {
             </AccordionContent>
           </AccordionItem>
 
-          <AccordionItem value="price" className="border-0">
-            <AccordionTrigger
-              className={cn(
-                "py-2 text-sm hover:bg-slate-100 hover:no-underline rounded-md",
-                isActive("/admin/price") && "bg-slate-100 font-medium"
-              )}
-            >
-              <span className="flex w-full items-center">
-                <PoundSterling className="mr-2 h-4 w-4" />
-                Quản lý giá xe
-              </span>
-            </AccordionTrigger>
-            <AccordionContent className="pl-6 py-0">
-              <Link href="/admin/price/get-price">
-                <div
-                  className={cn(
-                    "flex w-full items-center py-2 text-sm transition-all hover:bg-slate-100 rounded-md",
-                    isActive("/admin/price/get-price") &&
-                      "bg-slate-100 text-slate-900 font-medium"
-                  )}
-                >
-                  Xem giá hiện tại
-                </div>
-              </Link>
-              <Link href="/admin/price/update-price">
-                <div
-                  className={cn(
-                    "flex w-full items-center py-2 text-sm transition-all hover:bg-slate-100 rounded-md",
-                    isActive("/admin/price/update-price") &&
-                      "bg-slate-100 text-slate-900 font-medium"
-                  )}
-                >
-                  Chỉnh sửa giá
-                </div>
-              </Link>
-            </AccordionContent>
-          </AccordionItem>
+          <Link href="/admin/prices">
+          <div
+            className={cn(
+              "flex w-full items-center py-2 text-sm transition-all hover:bg-slate-100 rounded-md",
+              isActive("/admin/prices") &&
+                "bg-slate-100 text-slate-900 font-medium"
+            )}
+          >
+            <PoundSterling className="mr-2 h-4 w-4" />
+            Quản lý giá xe
+          </div>
+        </Link>
 
           <AccordionItem value="statistics" className="border-0">
             <AccordionTrigger

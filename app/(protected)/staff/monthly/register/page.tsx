@@ -1,12 +1,15 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
 import { toast } from "sonner";
-import { Loader2, CreditCard, Check } from "lucide-react";
-
+import {
+  Loader2,
+  CreditCard,
+  Check,
+} from "lucide-react";
 import {
   Card,
   CardContent,
@@ -14,7 +17,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
@@ -24,7 +26,19 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import {
   Select,
   SelectContent,
@@ -33,16 +47,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useFetchWithAuth } from "@/hooks/use-fetch-with-auth";
 
 // Interface cho loại xe
@@ -100,7 +104,7 @@ interface RegisterCardResponse {
 }
 
 const isNotBicycle = (vehicleType: VehicleType) => {
-  return !vehicleType.name.toLowerCase().includes("Bicycle");
+  return !vehicleType.name.toLowerCase().includes("bicycle");
 };
 
 // Schema xác thực form với Zod
@@ -139,15 +143,6 @@ const registerFormSchema = z
     color: z.string().min(1, "Màu xe không được để trống"),
   })
   .superRefine((data, ctx) => {
-    // Chỉ kiểm tra khi form được submit (có giá trị trong các trường bắt buộc khác)
-    // const hasRequiredFields =
-    //   data.name && data.dob && data.phoneNumber && data.address && data.email;
-
-    // if (!hasRequiredFields) {
-    //   // Nếu chưa nhập các trường bắt buộc khác, bỏ qua việc validate các trường đặc thù
-    //   return;
-    // }
-    // Nếu là giảng viên, phải có lecturerId và các trường sinh viên phải trống
     if (data.customerType === "LECTURER") {
       if (!data.lecturerId) {
         ctx.addIssue({
@@ -241,6 +236,8 @@ export default function MonthlyCardRegistrationPage() {
   const [vehicleTypes, setVehicleTypes] = useState<VehicleType[]>([]);
   const [fetchingTypes, setFetchingTypes] = useState(true);
   const [showSuccessDialog, setShowSuccessDialog] = useState(false);
+  const [showConfirmDialog, setShowConfirmDialog] = useState(false);
+  const [formData, setFormData] = useState<FormValues | null>(null);
   const [registrationResult, setRegistrationResult] = useState<
     RegisterCardResponse["result"] | null
   >(null);
@@ -307,16 +304,25 @@ export default function MonthlyCardRegistrationPage() {
     fetchVehicleTypes();
   }, [fetchWithAuth, form]);
 
-  // Xử lý submit form
-  const onSubmit = async (values: FormValues) => {
+  // Xử lý submit form - hiển thị dialog xác nhận
+  const onSubmit = (values: FormValues) => {
+    setFormData(values);
+    setShowConfirmDialog(true);
+  };
+
+  // Xử lý khi người dùng xác nhận đăng ký
+  const handleConfirmRegistration = async () => {
+    if (!formData) return;
+    
     try {
       setLoading(true);
-
+      setShowConfirmDialog(false);
+      
       const data = await fetchWithAuth<RegisterCardResponse>(
         "http://localhost:8080/api/monthly-cards",
         {
           method: "POST",
-          body: JSON.stringify(values),
+          body: JSON.stringify(formData),
         }
       );
 
@@ -874,6 +880,92 @@ export default function MonthlyCardRegistrationPage() {
         </CardContent>
       </Card>
 
+      {/* Dialog xác nhận */}
+      <AlertDialog open={showConfirmDialog} onOpenChange={setShowConfirmDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Xác nhận đăng ký thẻ tháng</AlertDialogTitle>
+            <AlertDialogDescription>
+              <div className="space-y-4">
+                <p>Bạn có chắc chắn muốn đăng ký thẻ tháng với thông tin sau đây?</p>
+
+                {formData && (
+                  <div>
+                    {/* Thông tin khách hàng */}
+                    <div className="bg-slate-50 p-3 rounded-md space-y-2 mt-2">
+                      <div className="text-sm font-semibold text-slate-800">
+                        Thông tin khách hàng
+                      </div>
+                      <div className="grid grid-cols-2 gap-1 text-sm">
+                        <div className="text-slate-500">Họ tên:</div>
+                        <div className="font-medium">{formData.name}</div>
+
+                        <div className="text-slate-500">Loại khách hàng:</div>
+                        <div className="font-medium">
+                          {formData.customerType === "LECTURER" ? "Giảng viên" : "Sinh viên"}
+                        </div>
+                        
+                        <div className="text-slate-500">Thời hạn:</div>
+                        <div className="font-medium">{formData.durationInMonths} tháng</div>
+                        
+                        <div className="text-slate-500">Số điện thoại:</div>
+                        <div className="font-medium">{formData.phoneNumber}</div>
+                      </div>
+                    </div>
+
+                    {/* Thông tin xe */}
+                    <div className="bg-slate-50 p-3 rounded-md space-y-2 mt-3">
+                      <div className="text-sm font-semibold text-slate-800">
+                        Thông tin xe
+                      </div>
+                      <div className="grid grid-cols-2 gap-1 text-sm">
+                        <div className="text-slate-500">Biển số xe:</div>
+                        <div className="font-medium">{formData.licensePlate}</div>
+
+                        <div className="text-slate-500">Loại xe:</div>
+                        <div className="font-medium">
+                          {vehicleTypes.find(t => t.id === formData.vehicleTypeId)?.name || ""}
+                        </div>
+                        
+                        <div className="text-slate-500">Hãng xe:</div>
+                        <div className="font-medium">{formData.brand}</div>
+                        
+                        <div className="text-slate-500">Màu xe:</div>
+                        <div className="font-medium">{formData.color}</div>
+                      </div>
+                    </div>
+
+                    <div className="mt-4 text-amber-600 font-semibold">
+                      Lưu ý: Thông tin không thể thay đổi sau khi đăng ký.
+                    </div>
+                  </div>
+                )}
+              </div>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={loading}>Hủy bỏ</AlertDialogCancel>
+            <AlertDialogAction 
+              onClick={(e) => {
+                e.preventDefault(); // Ngăn dialog tự động đóng
+                handleConfirmRegistration();
+              }}
+              disabled={loading}
+              className="bg-blue-600 hover:bg-blue-700"
+            >
+              {loading ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Đang xử lý...
+                </>
+              ) : (
+                'Xác nhận đăng ký'
+              )}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
       {/* Dialog thành công */}
       <AlertDialog open={showSuccessDialog} onOpenChange={setShowSuccessDialog}>
         <AlertDialogContent className="max-w-2xl">
@@ -919,8 +1011,7 @@ export default function MonthlyCardRegistrationPage() {
 
                         <div className="text-slate-500">Loại khách hàng:</div>
                         <div className="font-medium">
-                          {registrationResult.customer.customerType ===
-                          "LECTURER"
+                          {registrationResult.customer.customerType === "LECTURER"
                             ? "Giảng viên"
                             : "Sinh viên"}
                         </div>
@@ -932,11 +1023,6 @@ export default function MonthlyCardRegistrationPage() {
                             : "Nữ"}
                         </div>
 
-                        <div className="text-slate-500">Ngày sinh:</div>
-                        <div className="font-medium">
-                          {formatDate(registrationResult.customer.dob)}
-                        </div>
-
                         <div className="text-slate-500">Số điện thoại:</div>
                         <div className="font-medium">
                           {registrationResult.customer.phoneNumber}
@@ -945,6 +1031,11 @@ export default function MonthlyCardRegistrationPage() {
                         <div className="text-slate-500">Email:</div>
                         <div className="font-medium">
                           {registrationResult.customer.email}
+                        </div>
+
+                        <div className="text-slate-500">Địa chỉ:</div>
+                        <div className="font-medium">
+                          {registrationResult.customer.address}
                         </div>
                       </div>
                     </div>
@@ -984,13 +1075,11 @@ export default function MonthlyCardRegistrationPage() {
                       </div>
                       <div className="grid grid-cols-2 gap-2">
                         <div className="text-slate-500">Số tiền:</div>
-                        <div className="font-bold text-green-600">
+                        <div className="font-medium text-green-600">
                           {formatCurrency(registrationResult.payment.amount)}
                         </div>
 
-                        <div className="text-slate-500">
-                          Thời gian thanh toán:
-                        </div>
+                        <div className="text-slate-500">Thời gian thanh toán:</div>
                         <div className="font-medium">
                           {formatDate(registrationResult.payment.createAt)}
                         </div>
