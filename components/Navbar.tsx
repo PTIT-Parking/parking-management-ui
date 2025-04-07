@@ -12,7 +12,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { User, LogOut, UserCircle, Settings } from "lucide-react";
+import { User, LogOut, UserCircle } from "lucide-react";
 import ThemeToggler from "./ThemeToggler";
 import { useAuth } from "@/hooks/use-auth";
 import { toast } from "sonner";
