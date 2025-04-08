@@ -3,6 +3,13 @@ import AdminSidebar from "@/components/AdminSidebar";
 
 const AdminLayout = ({ children }: { children: React.ReactNode }) => {
   return (
+    <>
+      <head>
+        <link
+          href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,0"
+          rel="stylesheet"
+        />
+      </head>
       <div className="flex flex-col min-h-screen">
         <Navbar />
         <div className="flex flex-1">
@@ -14,6 +21,7 @@ const AdminLayout = ({ children }: { children: React.ReactNode }) => {
           <div className="w-full flex-1 p-5 overflow-y-auto">{children}</div>
         </div>
       </div>
+    </>
   );
 };
 

@@ -13,7 +13,6 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { User, LogOut, UserCircle } from "lucide-react";
-import ThemeToggler from "./ThemeToggler";
 import { useAuth } from "@/hooks/use-auth";
 import { toast } from "sonner";
 
@@ -48,7 +47,6 @@ const Navbar = () => {
       </Link>
 
       <div className="flex items-center">
-        <ThemeToggler />
         <DropdownMenu>
           <DropdownMenuTrigger className="flex items-center focus:outline-none hover:bg-primary-600/20 py-1 px-2 rounded-md transition-colors hover:text-gray-400">
             <div className="h-8 w-8 rounded-full bg-primary-600/30 flex items-center justify-center">

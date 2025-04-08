@@ -36,6 +36,7 @@ import {
   PaginationPrevious,
 } from "@/components/ui/pagination";
 import { useDashboard } from "@/hooks/use-dashboard";
+import { MaterialIcon } from "@/components/Icon";
 
 export default function StaffDashboard() {
   const {
@@ -50,21 +51,21 @@ export default function StaffDashboard() {
     getPageNumbers,
     handlePageChange,
     formatTimestamp,
-    getVehicleTypeCount
+    getVehicleTypeCount,
   } = useDashboard(5); // 5 items per page
 
   // Script để cập nhật thời gian thực
   useEffect(() => {
     const updateTime = () => {
-      const timeElement = document.getElementById('live-time');
+      const timeElement = document.getElementById("live-time");
       if (timeElement) {
-        timeElement.textContent = new Date().toLocaleTimeString('vi-VN');
+        timeElement.textContent = new Date().toLocaleTimeString("vi-VN");
       }
     };
-    
+
     const interval = setInterval(updateTime, 1000);
     updateTime();
-    
+
     return () => clearInterval(interval);
   }, []);
 
@@ -167,24 +168,8 @@ export default function StaffDashboard() {
         <Card className="col-span-12 sm:col-span-6 lg:col-span-3 shadow-sm hover:shadow-md transition-shadow duration-300">
           <CardHeader className="pb-2 flex flex-row items-center justify-between space-y-0">
             <CardTitle className="text-m font-medium">Xe máy</CardTitle>
-            <div className="p-2 rounded-full bg-blue-100">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="16"
-                height="16"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                className="text-blue-600"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <path d="M4 16v-6a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v6"></path>
-                <path d="M18 14c.2 0 3 1.3 3 4v1h-5"></path>
-                <path d="M5 19h15a2 2 0 0 0 1.83-2.82L20 10"></path>
-                <path d="M6 14c-.2 0-3 1.3-3 4v1h5"></path>
-              </svg>
+            <div className="px-1.5 py-1 rounded-full bg-blue-100">
+              <MaterialIcon icon="motorcycle" className="text-blue-600" />
             </div>
           </CardHeader>
           <CardContent>
@@ -195,15 +180,13 @@ export default function StaffDashboard() {
               {/* Số lượng xe vào bên trái */}
               <span className="text-green-600 flex items-center text-xs gap-0.5 bg-green-50 rounded-full px-2 py-0.5">
                 <TrendingUp className="h-3 w-3" />
-                {getVehicleTypeCount("Motorbike", "ENTRY")}{" "}
-                vào
+                {getVehicleTypeCount("Motorbike", "ENTRY")} vào
               </span>
 
               {/* Số lượng xe ra bên phải */}
               <span className="text-red-600 flex items-center text-xs gap-0.5 bg-red-50 rounded-full px-2 py-0.5">
                 <TrendingDown className="h-3 w-3" />
-                {getVehicleTypeCount("Motorbike", "EXIT")}{" "}
-                ra
+                {getVehicleTypeCount("Motorbike", "EXIT")} ra
               </span>
             </div>
           </CardContent>
@@ -213,24 +196,11 @@ export default function StaffDashboard() {
         <Card className="col-span-12 sm:col-span-6 lg:col-span-3 shadow-sm hover:shadow-md transition-shadow duration-300">
           <CardHeader className="pb-2 flex flex-row items-center justify-between space-y-0">
             <CardTitle className="text-m font-medium">Xe tay ga</CardTitle>
-            <div className="p-2 rounded-full bg-green-100">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="16"
-                height="16"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
+            <div className="px-1.5 py-1 rounded-full bg-green-100">
+              <MaterialIcon
+                icon="electric_scooter"
                 className="text-green-600"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <path d="M5 19h15a2 2 0 0 0 1.84-2.75L16.5 5"></path>
-                <path d="M5 19v-8l2-2h5l2 3h4l.5 1"></path>
-                <circle cx="5" cy="19" r="2"></circle>
-                <circle cx="15" cy="19" r="2"></circle>
-              </svg>
+              />
             </div>
           </CardHeader>
           <CardContent>
@@ -241,15 +211,13 @@ export default function StaffDashboard() {
               {/* Số lượng xe vào bên trái */}
               <span className="text-green-600 flex items-center text-xs gap-0.5 bg-green-50 rounded-full px-2 py-0.5">
                 <TrendingUp className="h-3 w-3" />
-                {getVehicleTypeCount("Scooter", "ENTRY")}{" "}
-                vào
+                {getVehicleTypeCount("Scooter", "ENTRY")} vào
               </span>
 
               {/* Số lượng xe ra bên phải */}
               <span className="text-red-600 flex items-center text-xs gap-0.5 bg-red-50 rounded-full px-2 py-0.5">
                 <TrendingDown className="h-3 w-3" />
-                {getVehicleTypeCount("Scooter", "EXIT")}{" "}
-                ra
+                {getVehicleTypeCount("Scooter", "EXIT")} ra
               </span>
             </div>
           </CardContent>
@@ -259,23 +227,8 @@ export default function StaffDashboard() {
         <Card className="col-span-12 sm:col-span-6 lg:col-span-3 shadow-sm hover:shadow-md transition-shadow duration-300">
           <CardHeader className="pb-2 flex flex-row items-center justify-between space-y-0">
             <CardTitle className="text-m font-medium">Xe đạp</CardTitle>
-            <div className="p-2 rounded-full bg-yellow-100">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="16"
-                height="16"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                className="text-yellow-600"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <circle cx="5.5" cy="17.5" r="3.5"></circle>
-                <circle cx="18.5" cy="17.5" r="3.5"></circle>
-                <path d="M15 6a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm-3 11.5 1.5-5 4-3-5-1-2 4-4 5"></path>
-              </svg>
+            <div className="px-1.5 py-1 rounded-full bg-yellow-100">
+              <MaterialIcon icon="pedal_bike" className="text-yellow-600" />
             </div>
           </CardHeader>
           <CardContent>
@@ -286,15 +239,13 @@ export default function StaffDashboard() {
               {/* Số lượng xe vào bên trái */}
               <span className="text-green-600 flex items-center text-xs gap-0.5 bg-green-50 rounded-full px-2 py-0.5">
                 <TrendingUp className="h-3 w-3" />
-                {getVehicleTypeCount("Bicycle", "ENTRY")}{" "}
-                vào
+                {getVehicleTypeCount("Bicycle", "ENTRY")} vào
               </span>
 
               {/* Số lượng xe ra bên phải */}
               <span className="text-red-600 flex items-center text-xs gap-0.5 bg-red-50 rounded-full px-2 py-0.5">
                 <TrendingDown className="h-3 w-3" />
-                {getVehicleTypeCount("Bicycle", "EXIT")}{" "}
-                ra
+                {getVehicleTypeCount("Bicycle", "EXIT")} ra
               </span>
             </div>
           </CardContent>

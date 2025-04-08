@@ -66,6 +66,7 @@ import {
 } from "@/components/ui/pagination";
 import { cn } from "@/lib/utils";
 import { useFetchWithAuth } from "@/hooks/use-fetch-with-auth";
+import { MaterialIcon } from "@/components/Icon";
 
 // Định nghĩa interfaces
 interface VehicleType {
@@ -421,8 +422,8 @@ export default function ParkingHistoryPage() {
         <Card>
           <CardContent className="flex items-center justify-between pt-3">
             <div className="flex items-center">
-              <div className="p-2 rounded-full bg-yellow-100 mr-4">
-                <Car className="h-5 w-5 text-yellow-600" />
+              <div className="px-1.5 py-1 rounded-full bg-yellow-100 mr-4">
+                <MaterialIcon icon="pedal_bike" className="text-yellow-600" />
               </div>
               <div>
                 <p className="text-sm text-muted-foreground">Xe đạp</p>
@@ -435,8 +436,8 @@ export default function ParkingHistoryPage() {
         <Card>
           <CardContent className="flex items-center justify-between pt-3">
             <div className="flex items-center">
-              <div className="p-2 rounded-full bg-blue-100 mr-4">
-                <Car className="h-5 w-5 text-blue-600" />
+              <div className="px-1.5 py-1 rounded-full bg-blue-100 mr-4">
+                <MaterialIcon icon="motorcycle" className="text-blue-600" />
               </div>
               <div>
                 <p className="text-sm text-muted-foreground">Xe máy</p>
@@ -449,8 +450,11 @@ export default function ParkingHistoryPage() {
         <Card>
           <CardContent className="flex items-center justify-between pt-3">
             <div className="flex items-center">
-              <div className="p-2 rounded-full bg-purple-100 mr-4">
-                <Car className="h-5 w-5 text-purple-600" />
+              <div className="px-1.5 py-1 rounded-full bg-purple-100 mr-4">
+                <MaterialIcon
+                  icon="electric_scooter"
+                  className="text-purple-600"
+                />
               </div>
               <div>
                 <p className="text-sm text-muted-foreground">Xe tay ga</p>

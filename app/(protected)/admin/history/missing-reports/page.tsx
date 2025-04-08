@@ -321,10 +321,25 @@ export default function MissingReportsPage() {
           <CardContent className="flex items-center justify-between pt-3">
             <div className="flex items-center">
               <div className="p-2 rounded-full bg-blue-100 mr-4">
-                <Car className="h-5 w-5 text-blue-600" />
+                <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                className="text-blue-600"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <circle cx="5.5" cy="17.5" r="3.5"></circle>
+                <circle cx="18.5" cy="17.5" r="3.5"></circle>
+                <path d="M15 6a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm-3 11.5 1.5-5 4-3-5-1-2 4-4 5"></path>
+              </svg>
               </div>
               <div>
-                <p className="text-sm text-muted-foreground">Xe máy</p>
+                <p className="text-sm text-muted-foreground">Phương tiện</p>
                 <p className="text-2xl font-bold">
                   {reports.filter(report => 
                     report.vehicleType.name === "Motorbike" || 
