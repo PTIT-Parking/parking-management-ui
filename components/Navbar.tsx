@@ -16,7 +16,11 @@ import { User, LogOut, UserCircle } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { toast } from "sonner";
 
-const Navbar = () => {
+interface NavbarProps {
+  children?: React.ReactNode;
+}
+
+const Navbar = ({ children }: NavbarProps) => {
   const router = useRouter();
   const { user, logout } = useAuth();
 
@@ -41,10 +45,19 @@ const Navbar = () => {
   };
 
   return (
-    <div className="bg-primary dark:bg-slate-700 text-white py-2 px-5 flex justify-between items-center z-20">
-      <Link href={dashboardUrl} className="flex items-center">
-        <Image src={logo} alt="Ptit Parking" width={100} height={40} priority />
-      </Link>
+    <div className="bg-primary text-white py-2 px-5 flex justify-between items-center z-20">
+      <div className="flex items-center">
+        {children}
+        <Link href={dashboardUrl} className="flex items-center">
+          <Image
+            src={logo}
+            alt="Ptit Parking"
+            width={100}
+            height={40}
+            priority
+          />
+        </Link>
+      </div>
 
       <div className="flex items-center">
         <DropdownMenu>
@@ -52,7 +65,7 @@ const Navbar = () => {
             <div className="h-8 w-8 rounded-full bg-primary-600/30 flex items-center justify-center">
               <User className="h-5 w-5" />
             </div>
-            <span className="max-w-[150px] truncate">{displayName}</span>
+            <span className="max-w-[150px] truncate ml-2">{displayName}</span>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-56">
             <DropdownMenuLabel>

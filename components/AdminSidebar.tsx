@@ -1,7 +1,5 @@
 "use client";
-
-import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 import {
   Accordion,
@@ -19,31 +17,39 @@ import {
 
 const AdminSidebar = () => {
   const pathname = usePathname();
+  const router = useRouter();
 
   const isActive = (href: string) => {
     return pathname === href || pathname.startsWith(`${href}/`);
   };
 
+  // Hàm để xử lý điều hướng và đóng sidebar trên mobile
+  const handleNavigation = (href: string) => {
+    router.push(href);
+    // Tạo và dispatch event để đóng sidebar trên mobile
+    const customEvent = new CustomEvent("closeMobileSidebar");
+    document.dispatchEvent(customEvent);
+  };
+
   return (
-    <div className="h-full py-4 flex flex-col border-r bg-slate-50/50 dark:bg-slate-900/50">
+    <div className="h-full py-4 flex flex-col border-r bg-slate-50">
       <div className="px-4 mb-4">
         <h2 className="text-xl font-bold tracking-tight">ADMIN PAGE</h2>
       </div>
 
       <div className="space-y-1 flex-1 px-4">
         {/* Dashboard - Trang chủ */}
-        <Link href="/admin/dashboard">
-          <div
-            className={cn(
-              "flex w-full items-center py-2 text-sm transition-all hover:bg-slate-100 rounded-md",
-              isActive("/admin/dashboard") &&
-                "bg-slate-100 text-slate-900 font-medium"
-            )}
-          >
-            <LayoutDashboard className="mr-2 h-4 w-4" />
-            Dashboard
-          </div>
-        </Link>
+        <div
+          className={cn(
+            "flex w-full items-center py-2 text-sm transition-all hover:bg-slate-100 rounded-md cursor-pointer",
+            isActive("/admin/dashboard") &&
+              "bg-slate-100 text-slate-900 font-medium"
+          )}
+          onClick={() => handleNavigation("/admin/dashboard")}
+        >
+          <LayoutDashboard className="mr-2 h-4 w-4" />
+          Dashboard
+        </div>
 
         <Accordion type="single" collapsible className="w-full border-0">
           <AccordionItem value="staff" className="border-0">
@@ -59,28 +65,26 @@ const AdminSidebar = () => {
               </span>
             </AccordionTrigger>
             <AccordionContent className="pl-6 py-0">
-              <Link href="/admin/staff/staff-list">
-                <div
-                  className={cn(
-                    "flex w-full items-center py-2 text-sm transition-all hover:bg-slate-100 rounded-md",
-                    pathname === "/admin/staff" &&
-                      "bg-slate-100 text-slate-900 font-medium"
-                  )}
-                >
-                  Danh sách nhân viên
-                </div>
-              </Link>
-              <Link href="/admin/staff/add-staff">
-                <div
-                  className={cn(
-                    "flex w-full items-center py-2 text-sm transition-all hover:bg-slate-100 rounded-md",
-                    isActive("/admin/staff/new") &&
-                      "bg-slate-100 text-slate-900 font-medium"
-                  )}
-                >
-                  Thêm nhân viên mới
-                </div>
-              </Link>
+              <div
+                className={cn(
+                  "flex w-full items-center py-2 text-sm transition-all hover:bg-slate-100 rounded-md cursor-pointer",
+                  isActive("/admin/staff/staff-list") &&
+                    "bg-slate-100 text-slate-900 font-medium"
+                )}
+                onClick={() => handleNavigation("/admin/staff/staff-list")}
+              >
+                Danh sách nhân viên
+              </div>
+              <div
+                className={cn(
+                  "flex w-full items-center py-2 text-sm transition-all hover:bg-slate-100 rounded-md cursor-pointer",
+                  isActive("/admin/staff/add-staff") &&
+                    "bg-slate-100 text-slate-900 font-medium"
+                )}
+                onClick={() => handleNavigation("/admin/staff/add-staff")}
+              >
+                Thêm nhân viên mới
+              </div>
             </AccordionContent>
           </AccordionItem>
 
@@ -97,68 +101,67 @@ const AdminSidebar = () => {
               </span>
             </AccordionTrigger>
             <AccordionContent className="pl-6 py-0">
-              <Link href="/admin/history/parking-records">
-                <div
-                  className={cn(
-                    "flex w-full items-center py-2 text-sm transition-all hover:bg-slate-100 rounded-md",
-                    isActive("/admin/history/parking-records") &&
-                      "bg-slate-100 text-slate-900 font-medium"
-                  )}
-                >
-                  Xe ra vào
-                </div>
-              </Link>
+              <div
+                className={cn(
+                  "flex w-full items-center py-2 text-sm transition-all hover:bg-slate-100 rounded-md cursor-pointer",
+                  isActive("/admin/history/parking-records") &&
+                    "bg-slate-100 text-slate-900 font-medium"
+                )}
+                onClick={() =>
+                  handleNavigation("/admin/history/parking-records")
+                }
+              >
+                Xe ra vào
+              </div>
 
-              <Link href="/admin/history/monthly-cards">
-                <div
-                  className={cn(
-                    "flex w-full items-center py-2 text-sm transition-all hover:bg-slate-100 rounded-md",
-                    isActive("/admin/history/monthly-cards") &&
-                      "bg-slate-100 text-slate-900 font-medium"
-                  )}
-                >
-                  Đăng ký thẻ tháng
-                </div>
-              </Link>
+              <div
+                className={cn(
+                  "flex w-full items-center py-2 text-sm transition-all hover:bg-slate-100 rounded-md cursor-pointer",
+                  isActive("/admin/history/monthly-cards") &&
+                    "bg-slate-100 text-slate-900 font-medium"
+                )}
+                onClick={() => handleNavigation("/admin/history/monthly-cards")}
+              >
+                Đăng ký thẻ tháng
+              </div>
 
-              <Link href="/admin/history/missing-reports">
-                <div
-                  className={cn(
-                    "flex w-full items-center py-2 text-sm transition-all hover:bg-slate-100 rounded-md",
-                    isActive("/admin/history/missing-reports") &&
-                      "bg-slate-100 text-slate-900 font-medium"
-                  )}
-                >
-                  Báo cáo mất xe
-                </div>
-              </Link>
+              <div
+                className={cn(
+                  "flex w-full items-center py-2 text-sm transition-all hover:bg-slate-100 rounded-md cursor-pointer",
+                  isActive("/admin/history/missing-reports") &&
+                    "bg-slate-100 text-slate-900 font-medium"
+                )}
+                onClick={() =>
+                  handleNavigation("/admin/history/missing-reports")
+                }
+              >
+                Báo cáo mất xe
+              </div>
 
-              <Link href="/admin/history/payments">
-                <div
-                  className={cn(
-                    "flex w-full items-center py-2 text-sm transition-all hover:bg-slate-100 rounded-md",
-                    isActive("/admin/history/payments") &&
-                      "bg-slate-100 text-slate-900 font-medium"
-                  )}
-                >
-                  Giao dịch
-                </div>
-              </Link>
+              <div
+                className={cn(
+                  "flex w-full items-center py-2 text-sm transition-all hover:bg-slate-100 rounded-md cursor-pointer",
+                  isActive("/admin/history/payments") &&
+                    "bg-slate-100 text-slate-900 font-medium"
+                )}
+                onClick={() => handleNavigation("/admin/history/payments")}
+              >
+                Giao dịch
+              </div>
             </AccordionContent>
           </AccordionItem>
 
-          <Link href="/admin/prices">
           <div
             className={cn(
-              "flex w-full items-center py-2 text-sm transition-all hover:bg-slate-100 rounded-md",
+              "flex w-full items-center py-2 text-sm transition-all hover:bg-slate-100 rounded-md cursor-pointer",
               isActive("/admin/prices") &&
                 "bg-slate-100 text-slate-900 font-medium"
             )}
+            onClick={() => handleNavigation("/admin/prices")}
           >
             <PoundSterling className="mr-2 h-4 w-4" />
             Quản lý giá xe
           </div>
-        </Link>
 
           <AccordionItem value="statistics" className="border-0">
             <AccordionTrigger
@@ -173,28 +176,26 @@ const AdminSidebar = () => {
               </span>
             </AccordionTrigger>
             <AccordionContent className="pl-6 py-0">
-              <Link href="/admin/statistic/revenue">
-                <div
-                  className={cn(
-                    "flex w-full items-center py-2 text-sm transition-all hover:bg-slate-100 rounded-md",
-                    isActive("/admin/statistic/revenue") &&
-                      "bg-slate-100 text-slate-900 font-medium"
-                  )}
-                >
-                  Doanh thu tháng
-                </div>
-              </Link>
-              <Link href="/admin/statistic/traffic">
-                <div
-                  className={cn(
-                    "flex w-full items-center py-2 text-sm transition-all hover:bg-slate-100 rounded-md",
-                    isActive("/admin/statistic/traffic") &&
-                      "bg-slate-100 text-slate-900 font-medium"
-                  )}
-                >
-                  Lượt xe ra vào
-                </div>
-              </Link>
+              <div
+                className={cn(
+                  "flex w-full items-center py-2 text-sm transition-all hover:bg-slate-100 rounded-md cursor-pointer",
+                  isActive("/admin/statistic/revenue") &&
+                    "bg-slate-100 text-slate-900 font-medium"
+                )}
+                onClick={() => handleNavigation("/admin/statistic/revenue")}
+              >
+                Doanh thu tháng
+              </div>
+              <div
+                className={cn(
+                  "flex w-full items-center py-2 text-sm transition-all hover:bg-slate-100 rounded-md cursor-pointer",
+                  isActive("/admin/statistic/traffic") &&
+                    "bg-slate-100 text-slate-900 font-medium"
+                )}
+                onClick={() => handleNavigation("/admin/statistic/traffic")}
+              >
+                Lượt xe ra vào
+              </div>
             </AccordionContent>
           </AccordionItem>
         </Accordion>

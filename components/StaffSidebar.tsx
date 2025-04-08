@@ -1,7 +1,6 @@
 "use client";
 
-import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 import {
   Accordion,
@@ -18,31 +17,39 @@ import {
 
 const StaffSidebar = () => {
   const pathname = usePathname();
+  const router = useRouter();
 
   const isActive = (href: string) => {
     return pathname === href || pathname.startsWith(`${href}/`);
   };
 
+  // Hàm để xử lý điều hướng và đóng sidebar trên mobile
+  const handleNavigation = (href: string) => {
+    router.push(href);
+    // Tạo và dispatch event để đóng sidebar trên mobile
+    const customEvent = new CustomEvent("closeMobileSidebar");
+    document.dispatchEvent(customEvent);
+  };
+
   return (
-    <div className="h-full py-4 flex flex-col border-r bg-slate-50/50 dark:bg-slate-900/50">
+    <div className="h-full py-4 flex flex-col border-r bg-slate-50">
       <div className="px-4 mb-4">
         <h2 className="text-xl font-bold tracking-tight">STAFF PAGE</h2>
       </div>
 
       <div className="space-y-1 flex-1 px-4">
         {/* Dashboard - Trang chủ */}
-        <Link href="/staff/dashboard">
-          <div
-            className={cn(
-              "flex w-full items-center py-2 text-sm transition-all hover:bg-slate-100 rounded-md",
-              isActive("/staff/dashboard") &&
-                "bg-slate-100 text-slate-900 font-medium"
-            )}
-          >
-            <LayoutDashboard className="mr-2 h-4 w-4" />
-            Dashboard
-          </div>
-        </Link>
+        <div
+          className={cn(
+            "flex w-full items-center py-2 text-sm transition-all hover:bg-slate-100 rounded-md cursor-pointer",
+            isActive("/staff/dashboard") &&
+              "bg-slate-100 text-slate-900 font-medium"
+          )}
+          onClick={() => handleNavigation("/staff/dashboard")}
+        >
+          <LayoutDashboard className="mr-2 h-4 w-4" />
+          Dashboard
+        </div>
 
         <Accordion type="single" collapsible className="w-full border-0">
           <AccordionItem value="parking" className="border-0">
@@ -58,39 +65,36 @@ const StaffSidebar = () => {
               </span>
             </AccordionTrigger>
             <AccordionContent className="pl-6 py-0">
-              <Link href="/staff/parking/entry">
-                <div
-                  className={cn(
-                    "flex w-full items-center py-2 text-sm transition-all hover:bg-slate-100 rounded-md",
-                    isActive("/staff/parking/entry") &&
-                      "bg-slate-100 text-slate-900 font-medium"
-                  )}
-                >
-                  Ghi nhận xe vào
-                </div>
-              </Link>
-              <Link href="/staff/parking/exit">
-                <div
-                  className={cn(
-                    "flex w-full items-center py-2 text-sm transition-all hover:bg-slate-100 rounded-md",
-                    isActive("/staff/parking/exit") &&
-                      "bg-slate-100 text-slate-900 font-medium"
-                  )}
-                >
-                  Ghi nhận xe ra
-                </div>
-              </Link>
-              <Link href="/staff/parking/records">
-                <div
-                  className={cn(
-                    "flex w-full items-center py-2 text-sm transition-all hover:bg-slate-100 rounded-md",
-                    isActive("/staff/parking/records") &&
-                      "bg-slate-100 text-slate-900 font-medium"
-                  )}
-                >
-                  Xe đang trong bãi
-                </div>
-              </Link>
+              <div
+                className={cn(
+                  "flex w-full items-center py-2 text-sm transition-all hover:bg-slate-100 rounded-md cursor-pointer",
+                  isActive("/staff/parking/entry") &&
+                    "bg-slate-100 text-slate-900 font-medium"
+                )}
+                onClick={() => handleNavigation("/staff/parking/entry")}
+              >
+                Ghi nhận xe vào
+              </div>
+              <div
+                className={cn(
+                  "flex w-full items-center py-2 text-sm transition-all hover:bg-slate-100 rounded-md cursor-pointer",
+                  isActive("/staff/parking/exit") &&
+                    "bg-slate-100 text-slate-900 font-medium"
+                )}
+                onClick={() => handleNavigation("/staff/parking/exit")}
+              >
+                Ghi nhận xe ra
+              </div>
+              <div
+                className={cn(
+                  "flex w-full items-center py-2 text-sm transition-all hover:bg-slate-100 rounded-md cursor-pointer",
+                  isActive("/staff/parking/records") &&
+                    "bg-slate-100 text-slate-900 font-medium"
+                )}
+                onClick={() => handleNavigation("/staff/parking/records")}
+              >
+                Xe đang trong bãi
+              </div>
             </AccordionContent>
           </AccordionItem>
 
@@ -107,45 +111,44 @@ const StaffSidebar = () => {
               </span>
             </AccordionTrigger>
             <AccordionContent className="pl-6 py-0">
-              <Link href="/staff/monthly/register">
-                <div
-                  className={cn(
-                    "flex w-full items-center py-2 text-sm transition-all hover:bg-slate-100 rounded-md",
-                    isActive("/staff/monthly/create") &&
-                      "bg-slate-100 text-slate-900 font-medium"
-                  )}
-                >
-                  Đăng ký thẻ tháng
-                </div>
-              </Link>
-              <Link href="/staff/monthly/list-registration">
-                <div
-                  className={cn(
-                    "flex w-full items-center py-2 text-sm transition-all hover:bg-slate-100 rounded-md",
-                    isActive("/staff/monthly/list") &&
-                      "bg-slate-100 text-slate-900 font-medium"
-                  )}
-                >
-                  Danh sách thẻ tháng
-                </div>
-              </Link>
+              <div
+                className={cn(
+                  "flex w-full items-center py-2 text-sm transition-all hover:bg-slate-100 rounded-md cursor-pointer",
+                  isActive("/staff/monthly/register") &&
+                    "bg-slate-100 text-slate-900 font-medium"
+                )}
+                onClick={() => handleNavigation("/staff/monthly/register")}
+              >
+                Đăng ký thẻ tháng
+              </div>
+              <div
+                className={cn(
+                  "flex w-full items-center py-2 text-sm transition-all hover:bg-slate-100 rounded-md cursor-pointer",
+                  isActive("/staff/monthly/list-registration") &&
+                    "bg-slate-100 text-slate-900 font-medium"
+                )}
+                onClick={() =>
+                  handleNavigation("/staff/monthly/list-registration")
+                }
+              >
+                Danh sách thẻ tháng
+              </div>
             </AccordionContent>
           </AccordionItem>
         </Accordion>
 
-        {/* Missing Vehicle Reports - đơn giản hóa */}
-        <Link href="/staff/missing">
-          <div
-            className={cn(
-              "flex w-full items-center py-2 text-sm transition-all hover:bg-slate-100 rounded-md",
-              isActive("/staff/missing") &&
-                "bg-slate-100 text-slate-900 font-medium"
-            )}
-          >
-            <AlertTriangle className="mr-2 h-4 w-4" />
-            Báo mất thẻ xe
-          </div>
-        </Link>
+        {/* Missing Vehicle Reports */}
+        <div
+          className={cn(
+            "flex w-full items-center py-2 text-sm transition-all hover:bg-slate-100 rounded-md cursor-pointer",
+            isActive("/staff/missing") &&
+              "bg-slate-100 text-slate-900 font-medium"
+          )}
+          onClick={() => handleNavigation("/staff/missing")}
+        >
+          <AlertTriangle className="mr-2 h-4 w-4" />
+          Báo mất thẻ xe
+        </div>
       </div>
     </div>
   );
