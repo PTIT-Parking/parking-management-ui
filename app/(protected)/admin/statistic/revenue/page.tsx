@@ -36,6 +36,7 @@ import {
   Legend,
 } from "chart.js";
 import { useFetchWithAuth } from "@/hooks/use-fetch-with-auth";
+import { API_ENDPOINTS, buildApiUrl } from "@/config/api";
 
 // Đăng ký các thành phần cần thiết cho Chart.js
 ChartJS.register(
@@ -113,9 +114,11 @@ export default function RevenueStatisticPage() {
         setLoading(true);
         setError(null);
 
-        const data = await fetchWithAuth<ApiResponse>(
-          `http://localhost:8080/api/statistic/revenue?month=${selectedMonth}&year=${selectedYear}`
-        );
+        const apiUrl = buildApiUrl(API_ENDPOINTS.STATISTICS.REVENUE, {
+          month: Number(selectedMonth),
+          year: Number(selectedYear),
+        });
+        const data = await fetchWithAuth<ApiResponse>(apiUrl);
 
         if (data && data.code === 1000) {
           setRevenueData(data.result);

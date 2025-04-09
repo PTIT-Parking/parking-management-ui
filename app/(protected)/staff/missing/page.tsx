@@ -53,6 +53,7 @@ import {
 } from "lucide-react";
 
 import { useFetchWithAuth } from "@/hooks/use-fetch-with-auth";
+import { API_ENDPOINTS, buildApiUrl } from "@/config/api";
 
 // Định nghĩa interface
 interface VehicleType {
@@ -277,24 +278,22 @@ export default function MissingReportPage() {
       setShowConfirmDialog(false);
       setError(null);
 
-      const response = await fetchWithAuth<MissingReportResponse>(
-        "http://localhost:8080/api/missing-reports",
-        {
-          method: "POST",
-          body: JSON.stringify({
-            licensePlate: tempFormData.licensePlate || "",
-            vehicleTypeId: tempFormData.vehicleTypeId,
-            identifier: tempFormData.identifier || "",
-            name: tempFormData.name,
-            gender: tempFormData.gender,
-            phoneNumber: tempFormData.phoneNumber,
-            address: tempFormData.address,
-            brand: tempFormData.brand,
-            color: tempFormData.color,
-            identification: tempFormData.identification,
-          }),
-        }
-      );
+      const apiUrl = buildApiUrl(API_ENDPOINTS.MISSING_REPORTS);
+      const response = await fetchWithAuth<MissingReportResponse>(apiUrl, {
+        method: "POST",
+        body: JSON.stringify({
+          licensePlate: tempFormData.licensePlate || "",
+          vehicleTypeId: tempFormData.vehicleTypeId,
+          identifier: tempFormData.identifier || "",
+          name: tempFormData.name,
+          gender: tempFormData.gender,
+          phoneNumber: tempFormData.phoneNumber,
+          address: tempFormData.address,
+          brand: tempFormData.brand,
+          color: tempFormData.color,
+          identification: tempFormData.identification,
+        }),
+      });
 
       // Xử lý các trường hợp lỗi cụ thể
       if (response.code !== 1000) {

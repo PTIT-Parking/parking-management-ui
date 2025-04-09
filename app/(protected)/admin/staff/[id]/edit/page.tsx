@@ -57,6 +57,7 @@ import { Calendar } from "@/components/ui/calendar";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { vi } from "date-fns/locale";
+import { API_ENDPOINTS, buildApiUrl } from "@/config/api";
 
 // Định nghĩa kiểu dữ liệu
 interface StaffResponse {
@@ -156,15 +157,13 @@ export default function EditStaffPage() {
           return;
         }
 
-        const response = await fetch(
-          `http://localhost:8080/api/admin/staffs/${staffId}`,
-          {
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
+        const apiUrl = buildApiUrl(API_ENDPOINTS.ADMIN.STAFF_DETAIL(staffId));
+        const response = await fetch(apiUrl, {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        });
 
         if (!isMounted) return;
 

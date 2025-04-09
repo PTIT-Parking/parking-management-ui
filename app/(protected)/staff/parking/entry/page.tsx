@@ -41,6 +41,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { useFetchWithAuth } from "@/hooks/use-fetch-with-auth";
+import { API_ENDPOINTS, buildApiUrl } from "@/config/api";
 
 // Định nghĩa interface cho loại xe
 interface VehicleType {
@@ -167,9 +168,8 @@ export default function VehicleEntryPage() {
       try {
         setFetchingTypes(true);
 
-        const data = await fetchWithAuth<VehicleTypesResponse>(
-          "http://localhost:8080/api/parking/vehicle-types"
-        );
+        const apiUrl = buildApiUrl(API_ENDPOINTS.PARKING.VEHICLE_TYPES);
+        const data = await fetchWithAuth<VehicleTypesResponse>(apiUrl);
 
         // Nếu data là null (có lỗi 401), không cần xử lý tiếp
         if (!data) return;
@@ -218,13 +218,11 @@ export default function VehicleEntryPage() {
         return;
       }
 
-      const data = await fetchWithAuth<EntryResponse>(
-        "http://localhost:8080/api/parking/entry",
-        {
-          method: "POST",
-          body: JSON.stringify(requestBody),
-        }
-      );
+      const apiUrl = buildApiUrl(API_ENDPOINTS.PARKING.ENTRY);
+      const data = await fetchWithAuth<EntryResponse>(apiUrl, {
+        method: "POST",
+        body: JSON.stringify(requestBody),
+      });
 
       // Nếu data là null (có lỗi 401), không cần xử lý tiếp
       if (!data) return;

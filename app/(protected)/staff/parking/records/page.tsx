@@ -46,6 +46,7 @@ import {
 } from "@/components/ui/pagination";
 import { Button } from "@/components/ui/button";
 import { useFetchWithAuth } from "@/hooks";
+import { API_ENDPOINTS, buildApiUrl } from "@/config/api";
 
 // Định nghĩa interface cho record xe
 interface ParkingRecord {
@@ -97,9 +98,8 @@ export default function ParkingRecordsPage() {
   useEffect(() => {
     const fetchParkingRecords = async () => {
       try {
-        const data = await fetchWithAuth<ApiResponse>(
-          "http://localhost:8080/api/parking/records"
-        );
+        const apiUrl = buildApiUrl(API_ENDPOINTS.PARKING.RECORDS);
+        const data = await fetchWithAuth<ApiResponse>(apiUrl);
 
         if (data && data.code === 1000 && data.result) {
           const sortedRecords = [...data.result].sort(

@@ -40,6 +40,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { API_ENDPOINTS, buildApiUrl } from "@/config/api";
 
 // Khai báo các kiểu dữ liệu
 interface Staff {
@@ -96,7 +97,8 @@ export default function StaffList() {
       }
 
       // API call thực tế (thay đổi URL khi API sẵn sàng)
-      const response = await fetch("http://localhost:8080/api/admin/staffs", {
+      const apiUrl = buildApiUrl(API_ENDPOINTS.ADMIN.STAFFS);
+      const response = await fetch(apiUrl, {
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,

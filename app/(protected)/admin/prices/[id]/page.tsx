@@ -38,6 +38,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { useFetchWithAuth } from "@/hooks/use-fetch-with-auth";
+import { API_ENDPOINTS, buildApiUrl } from "@/config/api";
 
 // Định nghĩa interfaces
 interface VehicleType {
@@ -126,9 +127,8 @@ export default function UpdatePricePage() {
         setError(null);
 
         // Lấy danh sách loại xe từ API
-        const data = await fetchWithAuth<VehicleTypesResponse>(
-          "http://localhost:8080/api/parking/vehicle-types"
-        );
+        const apiUrl = buildApiUrl(API_ENDPOINTS.PARKING.VEHICLE_TYPES);
+        const data = await fetchWithAuth<VehicleTypesResponse>(apiUrl);
 
         if (data && data.code === 1000) {
           // Tìm loại xe phù hợp với ID từ params
@@ -176,13 +176,11 @@ export default function UpdatePricePage() {
         monthlyPrice: formValues.monthlyPrice,
       };
 
-      const data = await fetchWithAuth<ApiResponse>(
-        `http://localhost:8080/api/prices/${typeId}`,
-        {
-          method: "PUT",
-          body: JSON.stringify(payload),
-        }
-      );
+      const apiUrl = buildApiUrl(API_ENDPOINTS.PRICES.BY_ID(typeId));
+      const data = await fetchWithAuth<ApiResponse>(apiUrl, {
+        method: "PUT",
+        body: JSON.stringify(payload),
+      });
 
       if (data && data.code === 1000) {
         toast.success(`Cập nhật giá xe ${data.result.type.name} thành công`);

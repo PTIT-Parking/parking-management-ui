@@ -6,7 +6,8 @@ export const API_ENDPOINTS = {
   // Auth
   AUTH: {
     LOGIN: '/auth/login',
-    REFRESH_TOKEN: '/auth/refresh-token',
+    LOGOUT:'/auth/logout',
+    MY_INFO: '/auth/my-info'
   },
   
   // Parking
@@ -32,6 +33,7 @@ export const API_ENDPOINTS = {
 
   // Payments
   PAYMENTS: {
+    ALL: '/payments',
     AT_DATE: '/payments/at-date',
     BY_ID: (id: string) => `/payments/${id}`,
   },

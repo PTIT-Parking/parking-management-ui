@@ -67,6 +67,7 @@ import {
 import { cn } from "@/lib/utils";
 import { useFetchWithAuth } from "@/hooks/use-fetch-with-auth";
 import { MaterialIcon } from "@/components/Icon";
+import { API_ENDPOINTS, buildApiUrl } from "@/config/api";
 
 // Định nghĩa interfaces
 interface VehicleType {
@@ -155,9 +156,8 @@ export default function ParkingHistoryPage() {
       const month = date.getMonth() + 1; // getMonth() trả về 0-11
       const day = date.getDate();
 
-      const data = await fetchWithAuth<ApiResponse>(
-        `http://localhost:8080/api/parking/record-history?month=${month}&day=${day}`
-      );
+      const apiUrl = buildApiUrl(API_ENDPOINTS.PARKING.RECORD_HISTORY, {month, day})
+      const data = await fetchWithAuth<ApiResponse>(apiUrl);
 
       if (data && data.code === 1000) {
         // Sắp xếp theo thời gian ra mới nhất lên đầu

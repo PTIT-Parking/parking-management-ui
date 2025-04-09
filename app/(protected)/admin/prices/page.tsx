@@ -22,6 +22,7 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { useFetchWithAuth } from "@/hooks/use-fetch-with-auth";
 import { Badge } from "@/components/ui/badge";
+import { API_ENDPOINTS, buildApiUrl } from "@/config/api";
 
 // Định nghĩa interfaces
 interface VehicleType {
@@ -56,9 +57,8 @@ export default function GetPricePage() {
         setLoading(true);
         setError(null);
 
-        const data = await fetchWithAuth<ApiResponse>(
-          "http://localhost:8080/api/prices"
-        );
+        const apiUrl = buildApiUrl(API_ENDPOINTS.PRICES.ALL);
+        const data = await fetchWithAuth<ApiResponse>(apiUrl);
 
         if (data && data.code === 1000) {
           setPriceData(data.result);
@@ -181,7 +181,9 @@ export default function GetPricePage() {
           <Table>
             <TableHeader>
               <TableRow className="bg-slate-50 dark:bg-slate-800">
-                <TableHead className="font-medium text-center">Loại xe</TableHead>
+                <TableHead className="font-medium text-center">
+                  Loại xe
+                </TableHead>
                 <TableHead className="font-medium text-center">
                   Giá ngày (VNĐ)
                 </TableHead>
@@ -257,9 +259,7 @@ export default function GetPricePage() {
                       variant="outline"
                       size="sm"
                       onClick={() =>
-                        router.push(
-                          `/admin/prices/${price.type.id}`
-                        )
+                        router.push(`/admin/prices/${price.type.id}`)
                       }
                       className="h-8 w-8 p-0"
                     >

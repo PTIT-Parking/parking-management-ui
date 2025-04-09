@@ -5,11 +5,7 @@ import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
-import {
-  Loader2,
-  CreditCard,
-  Check,
-} from "lucide-react";
+import { Loader2, CreditCard, Check } from "lucide-react";
 import {
   Card,
   CardContent,
@@ -48,6 +44,7 @@ import {
 } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import { useFetchWithAuth } from "@/hooks/use-fetch-with-auth";
+import { API_ENDPOINTS, buildApiUrl } from "@/config/api";
 
 // Interface cho loại xe
 interface VehicleType {
@@ -276,9 +273,8 @@ export default function MonthlyCardRegistrationPage() {
       try {
         setFetchingTypes(true);
 
-        const data = await fetchWithAuth<VehicleTypesResponse>(
-          "http://localhost:8080/api/parking/vehicle-types"
-        );
+        const apiUrl = buildApiUrl(API_ENDPOINTS.PARKING.VEHICLE_TYPES);
+        const data = await fetchWithAuth<VehicleTypesResponse>(apiUrl);
 
         if (!data) return;
 
@@ -313,18 +309,16 @@ export default function MonthlyCardRegistrationPage() {
   // Xử lý khi người dùng xác nhận đăng ký
   const handleConfirmRegistration = async () => {
     if (!formData) return;
-    
+
     try {
       setLoading(true);
       setShowConfirmDialog(false);
-      
-      const data = await fetchWithAuth<RegisterCardResponse>(
-        "http://localhost:8080/api/monthly-cards",
-        {
-          method: "POST",
-          body: JSON.stringify(formData),
-        }
-      );
+
+      const apiUrl = buildApiUrl(API_ENDPOINTS.MONTHLY_CARDS.REGISTER);
+      const data = await fetchWithAuth<RegisterCardResponse>(apiUrl, {
+        method: "POST",
+        body: JSON.stringify(formData),
+      });
 
       if (!data) return;
 
@@ -887,7 +881,9 @@ export default function MonthlyCardRegistrationPage() {
             <AlertDialogTitle>Xác nhận đăng ký thẻ tháng</AlertDialogTitle>
             <AlertDialogDescription>
               <div className="space-y-4">
-                <p>Bạn có chắc chắn muốn đăng ký thẻ tháng với thông tin sau đây?</p>
+                <p>
+                  Bạn có chắc chắn muốn đăng ký thẻ tháng với thông tin sau đây?
+                </p>
 
                 {formData && (
                   <div>
@@ -902,14 +898,20 @@ export default function MonthlyCardRegistrationPage() {
 
                         <div className="text-slate-500">Loại khách hàng:</div>
                         <div className="font-medium">
-                          {formData.customerType === "LECTURER" ? "Giảng viên" : "Sinh viên"}
+                          {formData.customerType === "LECTURER"
+                            ? "Giảng viên"
+                            : "Sinh viên"}
                         </div>
-                        
+
                         <div className="text-slate-500">Thời hạn:</div>
-                        <div className="font-medium">{formData.durationInMonths} tháng</div>
-                        
+                        <div className="font-medium">
+                          {formData.durationInMonths} tháng
+                        </div>
+
                         <div className="text-slate-500">Số điện thoại:</div>
-                        <div className="font-medium">{formData.phoneNumber}</div>
+                        <div className="font-medium">
+                          {formData.phoneNumber}
+                        </div>
                       </div>
                     </div>
 
@@ -920,16 +922,20 @@ export default function MonthlyCardRegistrationPage() {
                       </div>
                       <div className="grid grid-cols-2 gap-1 text-sm">
                         <div className="text-slate-500">Biển số xe:</div>
-                        <div className="font-medium">{formData.licensePlate}</div>
+                        <div className="font-medium">
+                          {formData.licensePlate}
+                        </div>
 
                         <div className="text-slate-500">Loại xe:</div>
                         <div className="font-medium">
-                          {vehicleTypes.find(t => t.id === formData.vehicleTypeId)?.name || ""}
+                          {vehicleTypes.find(
+                            (t) => t.id === formData.vehicleTypeId
+                          )?.name || ""}
                         </div>
-                        
+
                         <div className="text-slate-500">Hãng xe:</div>
                         <div className="font-medium">{formData.brand}</div>
-                        
+
                         <div className="text-slate-500">Màu xe:</div>
                         <div className="font-medium">{formData.color}</div>
                       </div>
@@ -945,7 +951,7 @@ export default function MonthlyCardRegistrationPage() {
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel disabled={loading}>Hủy bỏ</AlertDialogCancel>
-            <AlertDialogAction 
+            <AlertDialogAction
               onClick={(e) => {
                 e.preventDefault(); // Ngăn dialog tự động đóng
                 handleConfirmRegistration();
@@ -959,7 +965,7 @@ export default function MonthlyCardRegistrationPage() {
                   Đang xử lý...
                 </>
               ) : (
-                'Xác nhận đăng ký'
+                "Xác nhận đăng ký"
               )}
             </AlertDialogAction>
           </AlertDialogFooter>
@@ -1011,7 +1017,8 @@ export default function MonthlyCardRegistrationPage() {
 
                         <div className="text-slate-500">Loại khách hàng:</div>
                         <div className="font-medium">
-                          {registrationResult.customer.customerType === "LECTURER"
+                          {registrationResult.customer.customerType ===
+                          "LECTURER"
                             ? "Giảng viên"
                             : "Sinh viên"}
                         </div>
@@ -1079,7 +1086,9 @@ export default function MonthlyCardRegistrationPage() {
                           {formatCurrency(registrationResult.payment.amount)}
                         </div>
 
-                        <div className="text-slate-500">Thời gian thanh toán:</div>
+                        <div className="text-slate-500">
+                          Thời gian thanh toán:
+                        </div>
                         <div className="font-medium">
                           {formatDate(registrationResult.payment.createAt)}
                         </div>

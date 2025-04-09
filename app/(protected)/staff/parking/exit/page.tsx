@@ -33,6 +33,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { useFetchWithAuth } from "@/hooks/use-fetch-with-auth";
+import { API_ENDPOINTS, buildApiUrl } from "@/config/api";
 
 // Định nghĩa interface cho kết quả API
 interface ExitResponse {
@@ -160,13 +161,11 @@ export default function VehicleExitPage() {
       };
 
       // Sử dụng fetchWithAuth
-      const data = await fetchWithAuth<ExitResponse>(
-        "http://localhost:8080/api/parking/exit",
-        {
-          method: "POST",
-          body: JSON.stringify(requestBody),
-        }
-      );
+      const apiUrl = buildApiUrl(API_ENDPOINTS.PARKING.EXIT);
+      const data = await fetchWithAuth<ExitResponse>(apiUrl, {
+        method: "POST",
+        body: JSON.stringify(requestBody),
+      });
 
       if (!data) return;
 

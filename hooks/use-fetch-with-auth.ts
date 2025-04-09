@@ -2,6 +2,7 @@ import { useState, useCallback } from "react";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import Cookies from "js-cookie";
+import { API_BASE_URL } from "@/config/api";
 
 export function useFetchWithAuth() {
   const router = useRouter();
@@ -25,10 +26,16 @@ export function useFetchWithAuth() {
   }, [router]);
 
   const fetchWithAuth = useCallback(
-    async <T>(url: string, options: RequestInit = {}): Promise<T> => {
+    async <T>(endpoint: string, options: RequestInit = {}): Promise<T> => {
       setLoading(true);
 
       try {
+        // Xây dựng URL đầy đủ
+        // Nếu endpoint đã là URL đầy đủ (http:// hoặc https://), sử dụng trực tiếp
+        const url = endpoint.startsWith("http")
+          ? endpoint
+          : `${API_BASE_URL}${endpoint}`;
+
         // Lấy token từ localStorage hoặc cookies (ưu tiên localStorage)
         const token = localStorage.getItem("token") || Cookies.get("authToken");
 

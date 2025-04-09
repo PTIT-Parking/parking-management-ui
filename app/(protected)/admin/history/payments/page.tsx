@@ -53,6 +53,7 @@ import {
 } from "@/components/ui/pagination";
 import { cn } from "@/lib/utils";
 import { useFetchWithAuth } from "@/hooks/use-fetch-with-auth";
+import { API_ENDPOINTS, buildApiUrl } from "@/config/api";
 
 // Định nghĩa interfaces
 interface Payment {
@@ -90,7 +91,9 @@ export default function PaymentHistoryPage() {
   const [totalPages, setTotalPages] = useState(1);
 
   // State cho bộ lọc loại thanh toán
-  const [paymentTypeFilter, setPaymentTypeFilter] = useState<"all" | "PARKING" | "MONTHLY">("all");
+  const [paymentTypeFilter, setPaymentTypeFilter] = useState<
+    "all" | "PARKING" | "MONTHLY"
+  >("all");
 
   // Hàm lấy dữ liệu cho ngày đã chọn
   const fetchPaymentData = async (date: Date) => {
@@ -101,9 +104,11 @@ export default function PaymentHistoryPage() {
       const month = date.getMonth() + 1; // getMonth() trả về 0-11
       const day = date.getDate();
 
-      const data = await fetchWithAuth<ApiResponse>(
-        `http://localhost:8080/api/payments/at-date?month=${month}&day=${day}`
-      );
+      const apiUrl = buildApiUrl(API_ENDPOINTS.PAYMENTS.AT_DATE, {
+        month,
+        day,
+      });
+      const data = await fetchWithAuth<ApiResponse>(apiUrl);
 
       if (data && data.code === 1000) {
         // Sắp xếp theo thời gian gần nhất
@@ -149,10 +154,12 @@ export default function PaymentHistoryPage() {
     if (paymentTypeFilter === "all") {
       setFilteredPayments(payments);
     } else {
-      const filtered = payments.filter(payment => payment.paymentType === paymentTypeFilter);
+      const filtered = payments.filter(
+        (payment) => payment.paymentType === paymentTypeFilter
+      );
       setFilteredPayments(filtered);
     }
-    
+
     setCurrentPage(1);
   }, [payments, paymentTypeFilter]);
 
@@ -384,11 +391,13 @@ export default function PaymentHistoryPage() {
                 }`}
               </CardDescription>
             </div>
-            
+
             <div className="mt-4 lg:mt-0">
               <Select
                 value={paymentTypeFilter}
-                onValueChange={(value) => setPaymentTypeFilter(value as "all" | "PARKING" | "MONTHLY")}
+                onValueChange={(value) =>
+                  setPaymentTypeFilter(value as "all" | "PARKING" | "MONTHLY")
+                }
               >
                 <SelectTrigger className="w-[180px]">
                   <SelectValue placeholder="Loại giao dịch" />

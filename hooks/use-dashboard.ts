@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { useFetchWithAuth } from "./use-fetch-with-auth";
+import { API_ENDPOINTS, buildApiUrl } from "@/config/api";
 
 interface VehicleStats {
   motorbike: number;
@@ -40,9 +41,8 @@ export function useDashboard(itemsPerPage = 5) {
       setError(null);
 
       // Sử dụng fetchWithAuth thay vì fetch trực tiếp
-      const data = await fetchWithAuth<ApiResponse>(
-        "http://localhost:8080/api/parking/today"
-      );
+      const apiUrl = buildApiUrl(API_ENDPOINTS.PARKING.TODAY);
+      const data = await fetchWithAuth<ApiResponse>(apiUrl);
 
       // Nếu data là null (xảy ra khi có lỗi 401), không cần xử lý tiếp
       if (!data) return;

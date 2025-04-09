@@ -49,6 +49,7 @@ import {
 } from "@/components/ui/pagination";
 import { Button } from "@/components/ui/button";
 import { useFetchWithAuth } from "@/hooks/use-fetch-with-auth";
+import { API_ENDPOINTS, buildApiUrl } from "@/config/api";
 
 // Định nghĩa interfaces
 interface VehicleType {
@@ -188,13 +189,19 @@ export default function AdminMonthlyCardHistoryPage() {
         setLoading(true);
 
         // Fetch thẻ còn hạn
+        const activeCardApiUrl = buildApiUrl(
+          API_ENDPOINTS.MONTHLY_CARDS.ACTIVE
+        );
         const activeCardsResponse = await fetchWithAuth<ApiResponse>(
-          "http://localhost:8080/api/monthly-cards/active"
+          activeCardApiUrl
         );
 
         // Fetch thẻ hết hạn
+        const expiredCardApiUrl = buildApiUrl(
+          API_ENDPOINTS.MONTHLY_CARDS.EXPIRE
+        );
         const expiredCardsResponse = await fetchWithAuth<ApiResponse>(
-          "http://localhost:8080/api/monthly-cards/expire"
+          expiredCardApiUrl
         );
 
         if (activeCardsResponse?.code === 1000) {

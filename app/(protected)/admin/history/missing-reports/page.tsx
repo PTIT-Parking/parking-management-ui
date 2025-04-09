@@ -1,7 +1,12 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { format, parseISO, differenceInMinutes, differenceInHours } from "date-fns";
+import {
+  format,
+  parseISO,
+  differenceInMinutes,
+  differenceInHours,
+} from "date-fns";
 import { vi } from "date-fns/locale";
 import {
   Loader2,
@@ -14,7 +19,7 @@ import {
   Info,
   FileText,
   X,
-  AlertTriangle
+  AlertTriangle,
 } from "lucide-react";
 import { toast } from "sonner";
 import {
@@ -52,6 +57,7 @@ import {
   PaginationPrevious,
 } from "@/components/ui/pagination";
 import { useFetchWithAuth } from "@/hooks/use-fetch-with-auth";
+import { API_ENDPOINTS, buildApiUrl } from "@/config/api";
 
 // Định nghĩa interfaces
 interface VehicleType {
@@ -114,58 +120,64 @@ export default function MissingReportsPage() {
   const { fetchWithAuth, loading: apiLoading } = useFetchWithAuth();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  
+
   // State cho danh sách báo cáo
   const [reports, setReports] = useState<MissingReport[]>([]);
-  
+
   // State cho tìm kiếm
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredReports, setFilteredReports] = useState<MissingReport[]>([]);
   const [isSearching, setIsSearching] = useState(false);
-  
+
   // State cho phân trang
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  
+
   // State cho dialog chi tiết
-  const [selectedReport, setSelectedReport] = useState<MissingReport | null>(null);
+  const [selectedReport, setSelectedReport] = useState<MissingReport | null>(
+    null
+  );
   const [detailDialogOpen, setDetailDialogOpen] = useState(false);
-  
+
   // Fetch danh sách báo cáo từ API
   useEffect(() => {
     const fetchMissingReports = async () => {
       try {
         setLoading(true);
         setError(null);
-        
-        const data = await fetchWithAuth<ApiResponse>(
-          "http://localhost:8080/api/missing-reports"
-        );
-        
+
+        const apiUrl = buildApiUrl(API_ENDPOINTS.MISSING_REPORTS);
+        const data = await fetchWithAuth<ApiResponse>(apiUrl);
+
         if (data && data.code === 1000) {
           // Sắp xếp theo thời gian tạo mới nhất
           const sortedReports = [...data.result].sort(
-            (a, b) => new Date(b.createAt).getTime() - new Date(a.createAt).getTime()
+            (a, b) =>
+              new Date(b.createAt).getTime() - new Date(a.createAt).getTime()
           );
-          
+
           setReports(sortedReports);
           setFilteredReports(sortedReports);
           setTotalPages(Math.ceil(sortedReports.length / ITEMS_PER_PAGE));
         } else {
-          throw new Error(data?.message || "Không thể lấy danh sách báo cáo mất xe");
+          throw new Error(
+            data?.message || "Không thể lấy danh sách báo cáo mất xe"
+          );
         }
       } catch (error) {
         console.error("Lỗi khi lấy danh sách báo cáo mất xe:", error);
-        setError("Không thể tải danh sách báo cáo mất xe. Vui lòng thử lại sau.");
+        setError(
+          "Không thể tải danh sách báo cáo mất xe. Vui lòng thử lại sau."
+        );
         toast.error("Không thể tải danh sách báo cáo mất xe");
       } finally {
         setLoading(false);
       }
     };
-    
+
     fetchMissingReports();
   }, [fetchWithAuth]);
-  
+
   // Xử lý tìm kiếm
   useEffect(() => {
     if (searchTerm.trim() === "") {
@@ -175,14 +187,16 @@ export default function MissingReportsPage() {
       setCurrentPage(1);
       return;
     }
-    
+
     setIsSearching(true);
     const lowercasedSearchTerm = searchTerm.toLowerCase();
-    
-    const results = reports.filter(report => {
+
+    const results = reports.filter((report) => {
       return (
-        (report.licensePlate && report.licensePlate.toLowerCase().includes(lowercasedSearchTerm)) ||
-        (report.identifier && report.identifier.toLowerCase().includes(lowercasedSearchTerm)) ||
+        (report.licensePlate &&
+          report.licensePlate.toLowerCase().includes(lowercasedSearchTerm)) ||
+        (report.identifier &&
+          report.identifier.toLowerCase().includes(lowercasedSearchTerm)) ||
         report.name.toLowerCase().includes(lowercasedSearchTerm) ||
         report.phoneNumber.includes(searchTerm) ||
         report.identification.includes(searchTerm) ||
@@ -190,29 +204,29 @@ export default function MissingReportsPage() {
         report.createBy.username.toLowerCase().includes(lowercasedSearchTerm)
       );
     });
-    
+
     setFilteredReports(results);
     setTotalPages(Math.ceil(results.length / ITEMS_PER_PAGE));
     setCurrentPage(1);
   }, [searchTerm, reports]);
-  
+
   // Lấy các báo cáo hiển thị trên trang hiện tại
   const getCurrentPageItems = () => {
     const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
     const endIndex = startIndex + ITEMS_PER_PAGE;
     return filteredReports.slice(startIndex, endIndex);
   };
-  
+
   // Xử lý chuyển trang
   const handlePageChange = (pageNumber: number) => {
     setCurrentPage(pageNumber);
   };
-  
+
   // Tạo mảng số trang để hiển thị phân trang
   const getPageNumbers = () => {
     const pageNumbers: number[] = [];
     const maxPagesToShow = 5;
-    
+
     if (totalPages <= maxPagesToShow) {
       for (let i = 1; i <= totalPages; i++) {
         pageNumbers.push(i);
@@ -236,10 +250,10 @@ export default function MissingReportsPage() {
         pageNumbers.push(i);
       }
     }
-    
+
     return pageNumbers;
   };
-  
+
   // Format thời gian đầy đủ
   const formatDateTime = (dateString: string) => {
     try {
@@ -248,15 +262,15 @@ export default function MissingReportsPage() {
       return dateString;
     }
   };
-  
+
   // Tính thời gian đỗ xe
   const calculateParkingDuration = (entryTime: string, exitTime: string) => {
     const entry = parseISO(entryTime);
     const exit = parseISO(exitTime);
-    
+
     const minutes = differenceInMinutes(exit, entry);
     const hours = differenceInHours(exit, entry);
-    
+
     if (hours < 1) {
       return `${minutes} phút`;
     } else {
@@ -264,13 +278,13 @@ export default function MissingReportsPage() {
       return `${hours} giờ ${remainingMinutes} phút`;
     }
   };
-  
+
   // Hiển thị chi tiết báo cáo
   const showReportDetail = (report: MissingReport) => {
     setSelectedReport(report);
     setDetailDialogOpen(true);
   };
-  
+
   // Hiển thị loader khi đang tải dữ liệu
   if (loading || apiLoading) {
     return (
@@ -279,11 +293,11 @@ export default function MissingReportsPage() {
       </div>
     );
   }
-  
+
   // Lấy dữ liệu hiển thị trên trang hiện tại
   const currentReports = getCurrentPageItems();
   const pageNumbers = getPageNumbers();
-  
+
   return (
     <div className="w-full px-4 py-6">
       {/* Header */}
@@ -293,14 +307,14 @@ export default function MissingReportsPage() {
           Danh sách các báo cáo mất xe đã được ghi nhận trong hệ thống
         </p>
       </div>
-      
+
       {/* Hiển thị lỗi nếu có */}
       {error && (
         <div className="mt-4 p-4 rounded-lg bg-red-50 border border-red-200 mb-8">
           <p className="text-red-600 font-medium">{error}</p>
         </div>
       )}
-      
+
       {/* Thống kê tổng quát */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
         <Card>
@@ -316,41 +330,44 @@ export default function MissingReportsPage() {
             </div>
           </CardContent>
         </Card>
-        
+
         <Card>
           <CardContent className="flex items-center justify-between pt-3">
             <div className="flex items-center">
               <div className="p-2 rounded-full bg-blue-100 mr-4">
                 <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="20"
-                height="20"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                className="text-blue-600"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <circle cx="5.5" cy="17.5" r="3.5"></circle>
-                <circle cx="18.5" cy="17.5" r="3.5"></circle>
-                <path d="M15 6a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm-3 11.5 1.5-5 4-3-5-1-2 4-4 5"></path>
-              </svg>
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  className="text-blue-600"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <circle cx="5.5" cy="17.5" r="3.5"></circle>
+                  <circle cx="18.5" cy="17.5" r="3.5"></circle>
+                  <path d="M15 6a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm-3 11.5 1.5-5 4-3-5-1-2 4-4 5"></path>
+                </svg>
               </div>
               <div>
                 <p className="text-sm text-muted-foreground">Phương tiện</p>
                 <p className="text-2xl font-bold">
-                  {reports.filter(report => 
-                    report.vehicleType.name === "Motorbike" || 
-                    report.vehicleType.name === "Scooter"
-                  ).length}
+                  {
+                    reports.filter(
+                      (report) =>
+                        report.vehicleType.name === "Motorbike" ||
+                        report.vehicleType.name === "Scooter"
+                    ).length
+                  }
                 </p>
               </div>
             </div>
           </CardContent>
         </Card>
-        
+
         <Card>
           <CardContent className="flex items-center justify-between pt-3">
             <div className="flex items-center">
@@ -360,21 +377,24 @@ export default function MissingReportsPage() {
               <div>
                 <p className="text-sm text-muted-foreground">Tổng phí đã thu</p>
                 <p className="text-2xl font-bold">
-                  {reports.reduce((sum, report) => sum + report.payment.amount, 0).toLocaleString("vi-VN")} VNĐ
+                  {reports
+                    .reduce((sum, report) => sum + report.payment.amount, 0)
+                    .toLocaleString("vi-VN")}{" "}
+                  VNĐ
                 </p>
               </div>
             </div>
           </CardContent>
         </Card>
       </div>
-      
+
       {/* Bảng danh sách báo cáo mất xe */}
       <Card className="shadow-sm">
         <CardHeader className="pb-4 border-b">
           <div className="flex flex-col lg:flex-row justify-between lg:items-center">
             <div>
               <CardTitle>
-                {isSearching 
+                {isSearching
                   ? `Kết quả tìm kiếm (${filteredReports.length})`
                   : `Danh sách báo cáo mất xe (${reports.length})`}
               </CardTitle>
@@ -384,7 +404,7 @@ export default function MissingReportsPage() {
                   : "Danh sách tất cả báo cáo mất xe theo thứ tự thời gian gần đây nhất"}
               </CardDescription>
             </div>
-            
+
             {/* Tìm kiếm */}
             <div className="w-full lg:w-[320px] mt-4 lg:mt-0">
               <div className="relative">
@@ -410,21 +430,39 @@ export default function MissingReportsPage() {
             </div>
           </div>
         </CardHeader>
-        
+
         <CardContent className="p-0">
           <div className="overflow-x-auto">
             <Table>
               <TableHeader>
                 <TableRow className="bg-slate-50 dark:bg-slate-800">
-                  <TableHead className="font-medium w-[5%] text-center">STT</TableHead>
-                  <TableHead className="font-medium w-[15%] text-center">Ngày báo cáo</TableHead>
-                  <TableHead className="font-medium w-[15%] text-center">Biển số/Identifier</TableHead>
-                  <TableHead className="font-medium w-[15%] text-center">Người báo cáo</TableHead>
-                  <TableHead className="font-medium w-[10%] text-center">Loại xe</TableHead>
-                  <TableHead className="font-medium w-[10%] text-center">Thương hiệu</TableHead>
-                  <TableHead className="font-medium w-[10%] text-center">Phí (VNĐ)</TableHead>
-                  <TableHead className="font-medium w-[10%] text-center">Nhân viên</TableHead>
-                  <TableHead className="font-medium w-[10%] text-center">Chi tiết</TableHead>
+                  <TableHead className="font-medium w-[5%] text-center">
+                    STT
+                  </TableHead>
+                  <TableHead className="font-medium w-[15%] text-center">
+                    Ngày báo cáo
+                  </TableHead>
+                  <TableHead className="font-medium w-[15%] text-center">
+                    Biển số/Identifier
+                  </TableHead>
+                  <TableHead className="font-medium w-[15%] text-center">
+                    Người báo cáo
+                  </TableHead>
+                  <TableHead className="font-medium w-[10%] text-center">
+                    Loại xe
+                  </TableHead>
+                  <TableHead className="font-medium w-[10%] text-center">
+                    Thương hiệu
+                  </TableHead>
+                  <TableHead className="font-medium w-[10%] text-center">
+                    Phí (VNĐ)
+                  </TableHead>
+                  <TableHead className="font-medium w-[10%] text-center">
+                    Nhân viên
+                  </TableHead>
+                  <TableHead className="font-medium w-[10%] text-center">
+                    Chi tiết
+                  </TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -452,7 +490,9 @@ export default function MissingReportsPage() {
                   currentReports.map((report, index) => (
                     <TableRow
                       key={index}
-                      className={index % 2 === 0 ? "bg-white" : "bg-slate-50/50"}
+                      className={
+                        index % 2 === 0 ? "bg-white" : "bg-slate-50/50"
+                      }
                     >
                       <TableCell className="text-center text-slate-500">
                         {(currentPage - 1) * ITEMS_PER_PAGE + index + 1}
@@ -470,20 +510,22 @@ export default function MissingReportsPage() {
                       <TableCell>
                         <div className="flex flex-col items-center">
                           <div className="font-medium">{report.name}</div>
-                          <div className="text-xs text-slate-500">{report.phoneNumber}</div>
+                          <div className="text-xs text-slate-500">
+                            {report.phoneNumber}
+                          </div>
                         </div>
                       </TableCell>
                       <TableCell className="text-center">
                         <div className="flex items-center justify-center gap-2">
                           <span
                             className={`w-2 h-2 rounded-full inline-block ${
-                              report.vehicleType.name === "Bicycle" 
-                                ? "bg-yellow-500" :
-                              report.vehicleType.name === "Motorbike" 
-                                ? "bg-blue-500" : 
-                              report.vehicleType.name === "Scooter"
-                                ? "bg-green-500" :
-                              "bg-purple-500"
+                              report.vehicleType.name === "Bicycle"
+                                ? "bg-yellow-500"
+                                : report.vehicleType.name === "Motorbike"
+                                ? "bg-blue-500"
+                                : report.vehicleType.name === "Scooter"
+                                ? "bg-green-500"
+                                : "bg-purple-500"
                             }`}
                           ></span>
                           {report.vehicleType.name}
@@ -494,7 +536,9 @@ export default function MissingReportsPage() {
                           <Palette className="h-3 w-3 text-slate-400" />
                           <span>{report.brand}</span>
                         </div>
-                        <div className="text-xs text-slate-500 mt-1">{report.color}</div>
+                        <div className="text-xs text-slate-500 mt-1">
+                          {report.color}
+                        </div>
                       </TableCell>
                       <TableCell className="font-medium text-center">
                         {report.payment.amount.toLocaleString("vi-VN")}
@@ -521,7 +565,7 @@ export default function MissingReportsPage() {
               </TableBody>
             </Table>
           </div>
-          
+
           {/* Phân trang */}
           {totalPages > 1 && (
             <div className="py-4 border-t px-4">
@@ -529,11 +573,17 @@ export default function MissingReportsPage() {
                 <PaginationContent>
                   <PaginationItem>
                     <PaginationPrevious
-                      onClick={() => handlePageChange(Math.max(1, currentPage - 1))}
-                      className={currentPage === 1 ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                      onClick={() =>
+                        handlePageChange(Math.max(1, currentPage - 1))
+                      }
+                      className={
+                        currentPage === 1
+                          ? "pointer-events-none opacity-50"
+                          : "cursor-pointer"
+                      }
                     />
                   </PaginationItem>
-                  
+
                   {pageNumbers[0] > 1 && (
                     <>
                       <PaginationItem>
@@ -548,7 +598,7 @@ export default function MissingReportsPage() {
                       )}
                     </>
                   )}
-                  
+
                   {pageNumbers.map((pageNumber) => (
                     <PaginationItem key={pageNumber}>
                       <PaginationLink
@@ -559,7 +609,7 @@ export default function MissingReportsPage() {
                       </PaginationLink>
                     </PaginationItem>
                   ))}
-                  
+
                   {pageNumbers[pageNumbers.length - 1] < totalPages && (
                     <>
                       {pageNumbers[pageNumbers.length - 1] < totalPages - 1 && (
@@ -568,17 +618,25 @@ export default function MissingReportsPage() {
                         </PaginationItem>
                       )}
                       <PaginationItem>
-                        <PaginationLink onClick={() => handlePageChange(totalPages)}>
+                        <PaginationLink
+                          onClick={() => handlePageChange(totalPages)}
+                        >
                           {totalPages}
                         </PaginationLink>
                       </PaginationItem>
                     </>
                   )}
-                  
+
                   <PaginationItem>
                     <PaginationNext
-                      onClick={() => handlePageChange(Math.min(totalPages, currentPage + 1))}
-                      className={currentPage === totalPages ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                      onClick={() =>
+                        handlePageChange(Math.min(totalPages, currentPage + 1))
+                      }
+                      className={
+                        currentPage === totalPages
+                          ? "pointer-events-none opacity-50"
+                          : "cursor-pointer"
+                      }
                     />
                   </PaginationItem>
                 </PaginationContent>
@@ -587,7 +645,7 @@ export default function MissingReportsPage() {
           )}
         </CardContent>
       </Card>
-      
+
       {/* Dialog xem chi tiết báo cáo */}
       <Dialog open={detailDialogOpen} onOpenChange={setDetailDialogOpen}>
         <DialogContent className="sm:max-w-[600px]">
@@ -597,7 +655,7 @@ export default function MissingReportsPage() {
               Thông tin chi tiết về báo cáo mất xe
             </DialogDescription>
           </DialogHeader>
-          
+
           {selectedReport && (
             <div className="space-y-4">
               <div className="grid grid-cols-1 gap-4">
@@ -609,24 +667,32 @@ export default function MissingReportsPage() {
                   </h3>
                   <div className="grid grid-cols-3 gap-2 text-sm">
                     <div className="text-slate-500">Họ tên:</div>
-                    <div className="font-medium col-span-2">{selectedReport.name}</div>
-                    
+                    <div className="font-medium col-span-2">
+                      {selectedReport.name}
+                    </div>
+
                     <div className="text-slate-500">Giới tính:</div>
                     <div className="font-medium col-span-2">
                       {selectedReport.gender === "MALE" ? "Nam" : "Nữ"}
                     </div>
-                    
+
                     <div className="text-slate-500">CMND/CCCD:</div>
-                    <div className="font-medium col-span-2">{selectedReport.identification}</div>
-                    
+                    <div className="font-medium col-span-2">
+                      {selectedReport.identification}
+                    </div>
+
                     <div className="text-slate-500">Điện thoại:</div>
-                    <div className="font-medium col-span-2">{selectedReport.phoneNumber}</div>
-                    
+                    <div className="font-medium col-span-2">
+                      {selectedReport.phoneNumber}
+                    </div>
+
                     <div className="text-slate-500">Địa chỉ:</div>
-                    <div className="font-medium col-span-2">{selectedReport.address}</div>
+                    <div className="font-medium col-span-2">
+                      {selectedReport.address}
+                    </div>
                   </div>
                 </div>
-                
+
                 {/* Thông tin xe */}
                 <div className="bg-slate-50 p-3 rounded-md">
                   <h3 className="font-semibold text-slate-700 mb-2 flex items-center">
@@ -639,47 +705,53 @@ export default function MissingReportsPage() {
                       <div className="flex items-center gap-2">
                         <span
                           className={`w-2 h-2 rounded-full inline-block ${
-                            selectedReport.vehicleType.name === "Bicycle" 
-                              ? "bg-yellow-500" :
-                            selectedReport.vehicleType.name === "Motorbike" 
-                              ? "bg-blue-500" : 
-                            selectedReport.vehicleType.name === "Scooter"
-                              ? "bg-green-500" :
-                            "bg-purple-500"
+                            selectedReport.vehicleType.name === "Bicycle"
+                              ? "bg-yellow-500"
+                              : selectedReport.vehicleType.name === "Motorbike"
+                              ? "bg-blue-500"
+                              : selectedReport.vehicleType.name === "Scooter"
+                              ? "bg-green-500"
+                              : "bg-purple-500"
                           }`}
                         ></span>
                         {selectedReport.vehicleType.name}
                       </div>
                     </div>
-                    
+
                     <div className="text-slate-500">Biển số:</div>
                     <div className="font-medium col-span-2">
                       {selectedReport.licensePlate || "Không có"}
                     </div>
-                    
+
                     <div className="text-slate-500">Identifier:</div>
                     <div className="font-medium col-span-2">
                       {selectedReport.identifier || "Không có"}
                     </div>
-                    
+
                     <div className="text-slate-500">Thương hiệu:</div>
-                    <div className="font-medium col-span-2">{selectedReport.brand}</div>
-                    
+                    <div className="font-medium col-span-2">
+                      {selectedReport.brand}
+                    </div>
+
                     <div className="text-slate-500">Màu sắc:</div>
-                    <div className="font-medium col-span-2">{selectedReport.color}</div>
-                    
+                    <div className="font-medium col-span-2">
+                      {selectedReport.color}
+                    </div>
+
                     <div className="text-slate-500">Mã thẻ:</div>
                     <div className="font-medium col-span-2">
                       {selectedReport.record.card.cardId}
                     </div>
-                    
+
                     <div className="text-slate-500">Loại vé:</div>
                     <div className="font-medium col-span-2">
-                      {selectedReport.record.type === "DAILY" ? "Vé ngày" : "Vé tháng"}
+                      {selectedReport.record.type === "DAILY"
+                        ? "Vé ngày"
+                        : "Vé tháng"}
                     </div>
                   </div>
                 </div>
-                
+
                 {/* Thông tin thời gian */}
                 <div className="bg-slate-50 p-3 rounded-md">
                   <h3 className="font-semibold text-slate-700 mb-2 flex items-center">
@@ -691,12 +763,12 @@ export default function MissingReportsPage() {
                     <div className="font-medium col-span-2">
                       {formatDateTime(selectedReport.record.entryTime)}
                     </div>
-                    
+
                     <div className="text-slate-500">Thời gian báo mất:</div>
                     <div className="font-medium col-span-2">
                       {formatDateTime(selectedReport.createAt)}
                     </div>
-                    
+
                     <div className="text-slate-500">Thời gian gửi:</div>
                     <div className="font-medium col-span-2">
                       {calculateParkingDuration(
@@ -706,7 +778,7 @@ export default function MissingReportsPage() {
                     </div>
                   </div>
                 </div>
-                
+
                 {/* Thông tin thanh toán */}
                 <div className="bg-slate-50 p-3 rounded-md">
                   <h3 className="font-semibold text-slate-700 mb-2 flex items-center">
@@ -716,14 +788,15 @@ export default function MissingReportsPage() {
                   <div className="grid grid-cols-3 gap-2 text-sm">
                     <div className="text-slate-500">Phí bồi thường:</div>
                     <div className="font-medium col-span-2">
-                      {selectedReport.payment.amount.toLocaleString("vi-VN")} VNĐ
+                      {selectedReport.payment.amount.toLocaleString("vi-VN")}{" "}
+                      VNĐ
                     </div>
-                    
+
                     <div className="text-slate-500">Thời gian thanh toán:</div>
                     <div className="font-medium col-span-2">
                       {formatDateTime(selectedReport.payment.createAt)}
                     </div>
-                    
+
                     <div className="text-slate-500">Nhân viên xử lý:</div>
                     <div className="font-medium col-span-2">
                       {selectedReport.createBy.username}
@@ -733,7 +806,7 @@ export default function MissingReportsPage() {
               </div>
             </div>
           )}
-          
+
           <DialogFooter>
             <Button onClick={() => setDetailDialogOpen(false)}>Đóng</Button>
           </DialogFooter>

@@ -54,6 +54,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { MaterialIcon } from "@/components/Icon";
+import { API_ENDPOINTS, buildApiUrl } from "@/config/api";
 
 // Định nghĩa kiểu dữ liệu
 interface VehicleType {
@@ -151,9 +152,8 @@ export default function ListActiveMonthlyCards() {
     const fetchActiveCards = async () => {
       try {
         setIsLoading(true);
-        const data = await fetchWithAuth<ActiveCardsResponse>(
-          "http://localhost:8080/api/monthly-cards/active"
-        );
+        const apiUrl = buildApiUrl(API_ENDPOINTS.MONTHLY_CARDS.ACTIVE);
+        const data = await fetchWithAuth<ActiveCardsResponse>(apiUrl);
 
         if (data.code === 1000 && data.result) {
           setCards(data.result);
@@ -585,7 +585,10 @@ export default function ListActiveMonthlyCards() {
                 <TabsTrigger value="card">Thông tin thẻ</TabsTrigger>
               </TabsList>
               <div className="h-[230px] overflow-y-auto">
-                <TabsContent value="customer" className="space-y-4 m-0 data-[state=inactive]:hidden">
+                <TabsContent
+                  value="customer"
+                  className="space-y-4 m-0 data-[state=inactive]:hidden"
+                >
                   <div className="grid grid-cols-2 gap-3">
                     <div className="space-y-1">
                       <p className="text-sm font-medium text-gray-500">
@@ -652,7 +655,10 @@ export default function ListActiveMonthlyCards() {
                     </div>
                   </div>
                 </TabsContent>
-                <TabsContent value="vehicle" className="space-y-4 m-0 data-[state=inactive]:hidden">
+                <TabsContent
+                  value="vehicle"
+                  className="space-y-4 m-0 data-[state=inactive]:hidden"
+                >
                   <div className="grid grid-cols-2 gap-3">
                     <div className="space-y-1">
                       <p className="text-sm font-medium text-gray-500">
@@ -703,7 +709,10 @@ export default function ListActiveMonthlyCards() {
                     </div>
                   </div>
                 </TabsContent>
-                <TabsContent value="card" className="space-y-4 m-0 data-[state=inactive]:hidden">
+                <TabsContent
+                  value="card"
+                  className="space-y-4 m-0 data-[state=inactive]:hidden"
+                >
                   <div className="grid grid-cols-2 gap-3">
                     <div className="space-y-1">
                       <p className="text-sm font-medium text-gray-500">

@@ -9,6 +9,7 @@ import {
   useCallback,
 } from "react";
 import Cookies from "js-cookie";
+import { API_ENDPOINTS, buildApiUrl } from "@/config/api";
 
 // Định nghĩa interface cho thông tin người dùng
 export interface UserInfo {
@@ -52,13 +53,13 @@ export function AuthProvider({ children }: Readonly<{ children: ReactNode }>) {
   // Lấy thông tin người dùng từ API
   const refreshUserInfo = useCallback(async () => {
     try {
-      const token = Cookies.get("authToken");
+      const token = localStorage.getItem("token") || Cookies.get("authToken");
       if (!token) return;
 
-      if (loading) return;
-
       setLoading(true);
-      const response = await fetch("http://localhost:8080/api/auth/my-info", {
+
+      const apiUrl = buildApiUrl(API_ENDPOINTS.AUTH.MY_INFO);
+      const response = await fetch(apiUrl, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -88,7 +89,7 @@ export function AuthProvider({ children }: Readonly<{ children: ReactNode }>) {
     } finally {
       setLoading(false);
     }
-  }, [loading]);
+  }, []);
 
   // Kiểm tra và lấy thông tin người dùng khi component được mount
   useEffect(() => {
@@ -125,7 +126,8 @@ export function AuthProvider({ children }: Readonly<{ children: ReactNode }>) {
     setError(null);
 
     try {
-      const response = await fetch("http://localhost:8080/api/auth/login", {
+      const apiUrl = buildApiUrl(API_ENDPOINTS.AUTH.LOGIN);
+      const response = await fetch(apiUrl, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -180,16 +182,14 @@ export function AuthProvider({ children }: Readonly<{ children: ReactNode }>) {
       if (token) {
         // Gọi API logout
         try {
-          const response = await fetch(
-            "http://localhost:8080/api/auth/logout",
-            {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify({ token }),
-            }
-          );
+          const apiUrl = buildApiUrl(API_ENDPOINTS.AUTH.LOGOUT);
+          const response = await fetch(apiUrl, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ token }),
+          });
 
           const data = await response.json();
 
