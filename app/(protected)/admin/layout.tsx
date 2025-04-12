@@ -30,19 +30,23 @@ const AdminLayout = ({ children }: { children: React.ReactNode }) => {
           rel="stylesheet"
         />
       </head>
-      <div className="flex flex-col min-h-screen">
-        <Navbar>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="md:hidden mr-2"
-            onClick={() => setShowMobileSidebar(!showMobileSidebar)}
-          >
-            <Menu className="h-5 w-5 text-white" />
-          </Button>
-        </Navbar>
+      <div className="flex flex-col h-screen overflow-hidden">
+        {/* Navbar - chiều cao cố định */}
+        <div className="shrink-0">
+          <Navbar>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="md:hidden mr-2"
+              onClick={() => setShowMobileSidebar(!showMobileSidebar)}
+            >
+              <Menu className="h-5 w-5 text-white" />
+            </Button>
+          </Navbar>
+        </div>
 
-        <div className="flex flex-1 relative">
+        {/* Phần nội dung chính - flex-1 để lấp đầy phần còn lại */}
+        <div className="flex flex-1 overflow-hidden">
           {/* Mobile sidebar overlay */}
           {showMobileSidebar && (
             <div
@@ -73,15 +77,15 @@ const AdminLayout = ({ children }: { children: React.ReactNode }) => {
             </div>
           </div>
 
-          {/* Desktop sidebar */}
-          <div className="hidden md:block w-[300px]">
-            <div className="sticky top-0 max-h-screen overflow-y-auto">
-              <AdminSidebar />
-            </div>
+          {/* Desktop sidebar - chiều rộng cố định, có thể cuộn */}
+          <div className="hidden md:block md:w-64 md:shrink-0 overflow-y-auto bg-slate-50 border-r">
+            <AdminSidebar />
           </div>
 
-          {/* Main content */}
-          <div className="w-full flex-1 p-5 overflow-y-auto">{children}</div>
+          {/* Main content - có thể cuộn */}
+          <div className="flex-1 overflow-y-auto">
+            <div className="p-5">{children}</div>
+          </div>
         </div>
       </div>
     </>

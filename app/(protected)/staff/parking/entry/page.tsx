@@ -47,6 +47,7 @@ import { API_ENDPOINTS, buildApiUrl } from "@/config/api";
 interface VehicleType {
   id: string;
   name: string;
+  vietnameseName?: string; // Thêm tên tiếng Việt
 }
 
 interface VehicleTypesResponse {
@@ -77,9 +78,31 @@ interface EntryResponse {
   };
 }
 
-// Định nghĩa schema xác thực form dùng Zod (giữ nguyên)
+// Ánh xạ tên tiếng Anh sang tiếng Việt
+const vehicleTypeNameMap: Record<string, string> = {
+  Bicycle: "Xe đạp",
+  Motorbike: "Xe máy",
+  Scooter: "Xe tay ga",
+};
+
+// Định nghĩa schema xác thực form dùng Zod
 const formSchema = z
   .object({
+    vehicleTypeId: z.string({
+      required_error: "Vui lòng chọn loại xe",
+    }),
+    cardId: z
+      .string()
+      .min(1, { message: "Mã số thẻ không được để trống" })
+      .refine(
+        (val) => {
+          const num = parseInt(val);
+          return !isNaN(num) && num >= 1 && num <= 999;
+        },
+        {
+          message: "Mã số thẻ phải là số nguyên từ 1-999",
+        }
+      ),
     licensePlate: z
       .string()
       .refine((val) => val.trim() !== "" || false, {
@@ -94,29 +117,20 @@ const formSchema = z
       })
       .optional()
       .or(z.literal("")),
-    vehicleTypeId: z.string({
-      required_error: "Vui lòng chọn loại xe",
-    }),
-    cardId: z
-      .string()
-      .refine(
-        (val) => {
-          if (val === "") return true; // Cho phép để trống
-
-          const num = parseInt(val);
-          return !isNaN(num) && num >= 1 && num <= 999;
-        },
-        {
-          message: "Mã số thẻ phải là số nguyên từ 1-999 hoặc để trống",
-        }
-      )
-      .optional()
-      .or(z.literal("")),
   })
-  .refine((data) => data.licensePlate || data.identifier, {
-    message: "Phải nhập ít nhất một trong hai: Biển số xe hoặc Identifier",
-    path: ["licensePlate"],
-  });
+  .refine(
+    (data) => {
+      // Nếu là xe đạp (có thể lấy theo ID), không cần kiểm tra biển số
+      if (data.vehicleTypeId && data.vehicleTypeId.includes("Bicycle")) {
+        return true;
+      }
+      return data.licensePlate || data.identifier;
+    },
+    {
+      message: "Phải nhập ít nhất một trong hai: Biển số xe hoặc Identifier",
+      path: ["licensePlate"],
+    }
+  );
 
 type FormValues = z.infer<typeof formSchema>;
 
@@ -132,37 +146,74 @@ export default function VehicleEntryPage() {
     EntryResponse["result"] | null
   >(null);
 
-  // Khởi tạo form (giữ nguyên)
+  // Khởi tạo form với thứ tự ưu tiên mới
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      licensePlate: "",
-      identifier: "",
       vehicleTypeId: "",
       cardId: "",
+      licensePlate: "",
+      identifier: "",
     },
     mode: "onSubmit",
   });
 
   // Watch fields
+  const watchVehicleTypeId = form.watch("vehicleTypeId");
   const watchLicensePlate = form.watch("licensePlate");
   const watchIdentifier = form.watch("identifier");
   const isLoading = loading || apiLoading;
 
-  // useEffects cho watch fields
+  // Kiểm tra nếu xe đạp (Bicycle)
+  const isBicycle =
+    vehicleTypes.find((type) => type.id === watchVehicleTypeId)?.name ===
+    "Bicycle";
+
+  // Kiểm tra nếu xe máy hoặc xe tay ga
+  const isMotorizedVehicle =
+    vehicleTypes.find((type) => type.id === watchVehicleTypeId)?.name ===
+      "Motorbike" ||
+    vehicleTypes.find((type) => type.id === watchVehicleTypeId)?.name ===
+      "Scooter";
+
+  // useEffects để xử lý ràng buộc giữa các trường
   useEffect(() => {
-    // Nếu có biển số xe, xóa identifier
-    if (watchLicensePlate && form.getValues("identifier")) {
+    // Nếu loại xe thay đổi, cập nhật trạng thái các trường khác
+    if (isBicycle) {
+      // Nếu là xe đạp, xóa và disable biển số
+      form.setValue("licensePlate", "");
+      // Bật identify nếu nó trống
+      if (!form.getValues("identifier")) {
+        form.setFocus("identifier");
+      }
+    } else if (isMotorizedVehicle) {
+      // Nếu là xe máy/xe tay ga, xóa và disable identifier
+      form.setValue("identifier", "");
+      // Bật biển số nếu nó trống
+      if (!form.getValues("licensePlate")) {
+        form.setFocus("licensePlate");
+      }
+    }
+  }, [watchVehicleTypeId, form, isBicycle, isMotorizedVehicle]);
+
+  // Xử lý ràng buộc giữa licensePlate và identifier
+  useEffect(() => {
+    // Nếu có biển số xe, xóa identifier (trừ khi là xe đạp)
+    if (watchLicensePlate && form.getValues("identifier") && !isBicycle) {
       form.setValue("identifier", "");
     }
 
-    // Nếu có identifier, xóa biển số xe
-    if (watchIdentifier && form.getValues("licensePlate")) {
+    // Nếu có identifier, xóa biển số xe (trừ khi là xe máy hoặc xe tay ga)
+    if (
+      watchIdentifier &&
+      form.getValues("licensePlate") &&
+      !isMotorizedVehicle
+    ) {
       form.setValue("licensePlate", "");
     }
-  }, [watchLicensePlate, watchIdentifier, form]);
+  }, [watchLicensePlate, watchIdentifier, form, isBicycle, isMotorizedVehicle]);
 
-  // Fetch danh sách loại xe từ API sử dụng fetchWithAuth
+  // Fetch danh sách loại xe từ API
   useEffect(() => {
     const fetchVehicleTypes = async () => {
       try {
@@ -175,11 +226,17 @@ export default function VehicleEntryPage() {
         if (!data) return;
 
         if (data.code === 1000 && data.result) {
-          setVehicleTypes(data.result);
+          // Thêm tên tiếng Việt cho mỗi loại xe
+          const enhancedTypes = data.result.map((type) => ({
+            ...type,
+            vietnameseName: vehicleTypeNameMap[type.name] || type.name,
+          }));
+
+          setVehicleTypes(enhancedTypes);
 
           // Đặt giá trị mặc định cho loại xe nếu có dữ liệu
-          if (data.result.length > 0) {
-            form.setValue("vehicleTypeId", data.result[0].id);
+          if (enhancedTypes.length > 0) {
+            form.setValue("vehicleTypeId", enhancedTypes[0].id);
           }
         } else {
           throw new Error(data.message || "Không thể lấy danh sách loại xe");
@@ -195,7 +252,7 @@ export default function VehicleEntryPage() {
     fetchVehicleTypes();
   }, [form, fetchWithAuth]);
 
-  // Refactor: Xử lý submit form sử dụng fetchWithAuth
+  // Xử lý submit form
   const onSubmit = async (values: FormValues) => {
     try {
       setLoading(true);
@@ -205,18 +262,8 @@ export default function VehicleEntryPage() {
         licensePlate: values.licensePlate || "",
         identifier: values.identifier || "",
         vehicleTypeId: values.vehicleTypeId,
-        cardId: values.cardId ? values.cardId : "",
+        cardId: values.cardId,
       };
-
-      if (!values.cardId) {
-        // Đặt lỗi cho trường cardId
-        form.setError("cardId", {
-          type: "manual",
-          message: "Mã số thẻ không được để trống",
-        });
-        setLoading(false);
-        return;
-      }
 
       const apiUrl = buildApiUrl(API_ENDPOINTS.PARKING.ENTRY);
       const data = await fetchWithAuth<EntryResponse>(apiUrl, {
@@ -255,6 +302,11 @@ export default function VehicleEntryPage() {
         setEntryRecord(data.result);
         setShowSuccessDialog(true);
         form.reset(); // Reset form sau khi thành công
+
+        // Đặt lại giá trị mặc định cho loại xe
+        if (vehicleTypes.length > 0) {
+          form.setValue("vehicleTypeId", vehicleTypes[0].id);
+        }
       } else {
         toast.error("Ghi nhận xe vào bãi thất bại");
       }
@@ -271,7 +323,7 @@ export default function VehicleEntryPage() {
     setEntryRecord(null);
   };
 
-  // Cập nhật loading state để kết hợp cả loading từ form và từ API
+  // Hiển thị loading khi đang fetch dữ liệu
   if (fetchingTypes) {
     return (
       <div className="flex justify-center items-center h-64">
@@ -280,7 +332,7 @@ export default function VehicleEntryPage() {
     );
   }
 
-  // Phần return UI vẫn giữ nguyên
+  // UI với thứ tự trường đã thay đổi
   return (
     <div className="max-w-2xl mx-auto p-4">
       <Card>
@@ -293,66 +345,8 @@ export default function VehicleEntryPage() {
         <CardContent>
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-              {/* Form fields giữ nguyên */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <FormField
-                  control={form.control}
-                  name="licensePlate"
-                  render={({ field }) => (
-                    <FormItem className="flex flex-col h-full">
-                      <FormLabel>Biển số xe</FormLabel>
-                      <FormControl>
-                        <Input
-                          placeholder="Ví dụ: 59A-12345"
-                          {...field}
-                          disabled={!!watchIdentifier || isLoading}
-                          onChange={(e) => {
-                            field.onChange(e);
-                            // Xóa lỗi khi người dùng bắt đầu nhập
-                            form.clearErrors("licensePlate");
-                          }}
-                          // Thêm sự kiện onFocus để xóa lỗi khi click vào
-                          onFocus={() => {
-                            form.clearErrors("licensePlate");
-                            form.clearErrors("identifier");
-                          }}
-                        />
-                      </FormControl>
-                      <div className="min-h-[20px]">
-                        <FormMessage />
-                      </div>
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="identifier"
-                  render={({ field }) => (
-                    <FormItem className="flex flex-col h-full">
-                      <FormLabel>Identifier</FormLabel>
-                      <FormControl>
-                        <Input
-                          placeholder="Nhập ID nếu không có biển số"
-                          {...field}
-                          disabled={!!watchLicensePlate || isLoading}
-                          onChange={(e) => {
-                            field.onChange(e);
-                            form.clearErrors("identifier");
-                          }}
-                          onFocus={() => {
-                            form.clearErrors("identifier");
-                            form.clearErrors("licensePlate");
-                          }}
-                        />
-                      </FormControl>
-                      <div className="min-h-[20px]">
-                        <FormMessage />
-                      </div>
-                    </FormItem>
-                  )}
-                />
-
+                {/* Loại xe - đặt lên đầu tiên */}
                 <FormField
                   control={form.control}
                   name="vehicleTypeId"
@@ -375,7 +369,7 @@ export default function VehicleEntryPage() {
                         <SelectContent>
                           {vehicleTypes.map((type) => (
                             <SelectItem key={type.id} value={type.id}>
-                              {type.name}
+                              {type.vietnameseName || type.name}
                             </SelectItem>
                           ))}
                         </SelectContent>
@@ -387,6 +381,7 @@ export default function VehicleEntryPage() {
                   )}
                 />
 
+                {/* Mã số thẻ - đặt lên thứ hai */}
                 <FormField
                   control={form.control}
                   name="cardId"
@@ -416,14 +411,76 @@ export default function VehicleEntryPage() {
                     </FormItem>
                   )}
                 />
+
+                {/* Biển số xe */}
+                <FormField
+                  control={form.control}
+                  name="licensePlate"
+                  render={({ field }) => (
+                    <FormItem className="flex flex-col h-full">
+                      <FormLabel>Biển số xe</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="Ví dụ: 59A-12345"
+                          {...field}
+                          disabled={
+                            isLoading ||
+                            isBicycle || // Disable nếu là xe đạp
+                            !!watchIdentifier // Hoặc đã nhập identifier
+                          }
+                          onChange={(e) => {
+                            field.onChange(e);
+                            form.clearErrors("licensePlate");
+                          }}
+                          onFocus={() => {
+                            form.clearErrors("licensePlate");
+                            form.clearErrors("identifier");
+                          }}
+                        />
+                      </FormControl>
+                      <div className="min-h-[20px]">
+                        <FormMessage />
+                      </div>
+                    </FormItem>
+                  )}
+                />
+
+                {/* Identifier */}
+                <FormField
+                  control={form.control}
+                  name="identifier"
+                  render={({ field }) => (
+                    <FormItem className="flex flex-col h-full">
+                      <FormLabel>Identifier</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="Nhập ID nếu không có biển số"
+                          {...field}
+                          disabled={
+                            isLoading ||
+                            isMotorizedVehicle || // Disable nếu là xe máy/tay ga
+                            !!watchLicensePlate // Hoặc đã nhập biển số
+                          }
+                          onChange={(e) => {
+                            field.onChange(e);
+                            form.clearErrors("identifier");
+                          }}
+                          onFocus={() => {
+                            form.clearErrors("identifier");
+                            form.clearErrors("licensePlate");
+                          }}
+                        />
+                      </FormControl>
+                      <div className="min-h-[20px]">
+                        <FormMessage />
+                      </div>
+                    </FormItem>
+                  )}
+                />
               </div>
 
-              <Button
-                type="submit"
-                className="w-full"
-                disabled={isLoading} // Thêm apiLoading
-              >
-                {loading || apiLoading ? (
+              <Button type="submit" className="w-full" disabled={isLoading}>
+                {isLoading ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                     Đang xử lý...
@@ -440,7 +497,7 @@ export default function VehicleEntryPage() {
         </CardContent>
       </Card>
 
-      {/* Dialog thông báo thành công giữ nguyên */}
+      {/* Dialog thông báo thành công */}
       <AlertDialog open={showSuccessDialog} onOpenChange={setShowSuccessDialog}>
         <AlertDialogContent>
           <AlertDialogHeader>
@@ -455,9 +512,6 @@ export default function VehicleEntryPage() {
                 {entryRecord && (
                   <div className="bg-slate-50 p-4 rounded-md space-y-2 text-sm">
                     <div className="grid grid-cols-2 gap-2">
-                      <div className="text-slate-500">ID ghi nhận:</div>
-                      <div className="font-medium">{entryRecord.recordId}</div>
-
                       {entryRecord.licensePlate && (
                         <>
                           <div className="text-slate-500">Biển số:</div>
@@ -478,7 +532,8 @@ export default function VehicleEntryPage() {
 
                       <div className="text-slate-500">Loại xe:</div>
                       <div className="font-medium">
-                        {entryRecord.vehicleType.name}
+                        {vehicleTypeNameMap[entryRecord.vehicleType.name] ||
+                          entryRecord.vehicleType.name}
                       </div>
 
                       <div className="text-slate-500">Mã số thẻ:</div>

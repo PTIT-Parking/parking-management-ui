@@ -18,7 +18,6 @@ import {
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -59,6 +58,7 @@ import { API_ENDPOINTS, buildApiUrl } from "@/config/api";
 interface VehicleType {
   id: string;
   name: string;
+  vietnameseName?: string;
 }
 
 // Interface cho responses từ API
@@ -123,15 +123,24 @@ interface MissingReportResponse {
   };
 }
 
+// Ánh xạ tên tiếng Anh sang tiếng Việt
+const vehicleTypeNameMap: Record<string, string> = {
+  Bicycle: "Xe đạp",
+  Motorbike: "Xe máy",
+  Scooter: "Xe tay ga",
+};
+
 // Định nghĩa schema cho form
 const formSchema = z
   .object({
+    vehicleTypeId: z.string().min(1, "Vui lòng chọn loại xe"),
+    brand: z.string().min(1, "Vui lòng nhập hãng xe"),
     licensePlate: z
       .string()
       .min(1, "Vui lòng nhập biển số xe")
       .or(z.literal("")),
     identifier: z.string().optional().or(z.literal("")),
-    vehicleTypeId: z.string().min(1, "Vui lòng chọn loại xe"),
+    color: z.string().min(1, "Vui lòng nhập màu xe"),
     name: z.string().min(1, "Vui lòng nhập họ tên người báo mất"),
     gender: z.enum(["MALE", "FEMALE"], {
       required_error: "Vui lòng chọn giới tính",
@@ -143,8 +152,6 @@ const formSchema = z
         message: "Số điện thoại không hợp lệ",
       }),
     address: z.string().min(1, "Vui lòng nhập địa chỉ"),
-    brand: z.string().min(1, "Vui lòng nhập hãng xe"),
-    color: z.string().min(1, "Vui lòng nhập màu xe"),
     identification: z
       .string()
       .min(1, "Vui lòng nhập CMND/CCCD")
@@ -176,18 +183,18 @@ export default function MissingReportPage() {
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
+      vehicleTypeId: "",
+      brand: "",
       licensePlate: "",
       identifier: "",
-      vehicleTypeId: "",
+      color: "",
       name: "",
       gender: "MALE",
       phoneNumber: "",
       address: "",
-      brand: "",
-      color: "",
       identification: "",
     },
-    mode: "onSubmit", // Đổi mode thành onChange để validation tốt hơn
+    mode: "onSubmit",
   });
 
   // Fetch danh sách loại xe
@@ -197,22 +204,25 @@ export default function MissingReportPage() {
         setFetchingTypes(true);
         setError(null);
 
-        const data = await fetchWithAuth<VehicleTypesResponse>(
-          "http://localhost:8080/api/parking/vehicle-types"
-        );
+        const apiUrl = buildApiUrl(API_ENDPOINTS.PARKING.VEHICLE_TYPES);
+        const data = await fetchWithAuth<VehicleTypesResponse>(apiUrl);
 
         if (!data) {
           throw new Error("Không nhận được dữ liệu từ server");
         }
 
         if (data.code === 1000 && data.result) {
-          // Lọc loại xe (không gồm xe đạp)
-          const type = data.result;
-          setVehicleTypes(type);
+          // Thêm tên tiếng Việt cho mỗi loại xe
+          const enhancedTypes = data.result.map((type) => ({
+            ...type,
+            vietnameseName: vehicleTypeNameMap[type.name] || type.name,
+          }));
+
+          setVehicleTypes(enhancedTypes);
 
           // Đặt giá trị mặc định cho loại xe nếu có dữ liệu
-          if (type.length > 0) {
-            form.setValue("vehicleTypeId", type[0].id);
+          if (enhancedTypes.length > 0) {
+            form.setValue("vehicleTypeId", enhancedTypes[0].id);
           }
         } else {
           throw new Error(data.message || "Không thể lấy danh sách loại xe");
@@ -229,30 +239,47 @@ export default function MissingReportPage() {
     fetchVehicleTypes();
   }, [fetchWithAuth, form]);
 
-  // Watch cho các field licensePlate và identifier để xử lý logic disable
+  // Watch cho các field để xử lý logic disable
+  const watchVehicleTypeId = form.watch("vehicleTypeId");
   const watchLicensePlate = form.watch("licensePlate");
   const watchIdentifier = form.watch("identifier");
 
-  // Xử lý khi người dùng nhập biển số, xóa identifier
+  // Kiểm tra loại xe đã chọn
+  const selectedVehicleType = vehicleTypes.find(
+    (type) => type.id === watchVehicleTypeId
+  )?.name;
+
+  const isBicycle = selectedVehicleType === "Bicycle";
+  const isMotorizedVehicle =
+    selectedVehicleType === "Motorbike" || selectedVehicleType === "Scooter";
+
+  // Xử lý thay đổi loại xe
   useEffect(() => {
-    if (watchLicensePlate) {
+    if (isBicycle) {
+      // Nếu là xe đạp, xóa và disable biển số
+      form.setValue("licensePlate", "");
+    } else if (isMotorizedVehicle) {
+      // Nếu là xe máy/xe tay ga, xóa và disable identifier
+      form.setValue("identifier", "");
+    }
+  }, [watchVehicleTypeId, form, isBicycle, isMotorizedVehicle]);
+
+  // Xử lý khi người dùng nhập biển số
+  useEffect(() => {
+    if (watchLicensePlate && !isBicycle) {
       if (form.getValues("identifier")) {
         form.setValue("identifier", "");
       }
-      // Cập nhật lỗi cho licensePlate nếu cần
-      const plateError = form.getFieldState("licensePlate").error;
-      if (
-        plateError &&
-        /^[0-9A-Z]{2,3}[A-Z]{1,2}-[0-9]{3,4}\.[0-9]{2}$/.test(watchLicensePlate)
-      ) {
+      // Cập nhật lỗi nếu cần
+      if (form.formState.errors.licensePlate) {
         form.clearErrors("licensePlate");
       }
     }
-  }, [watchLicensePlate, form]);
+  }, [watchLicensePlate, form, isBicycle]);
 
-  // Xử lý khi người dùng nhập identifier, xóa biển số
+  // Xử lý khi người dùng nhập identifier
   useEffect(() => {
-    if (watchIdentifier) {
+    if (watchIdentifier && !isMotorizedVehicle) {
       if (form.getValues("licensePlate")) {
         form.setValue("licensePlate", "");
       }
@@ -261,7 +288,7 @@ export default function MissingReportPage() {
         form.clearErrors("identifier");
       }
     }
-  }, [watchIdentifier, form]);
+  }, [watchIdentifier, form, isMotorizedVehicle]);
 
   // Xử lý khi người dùng submit form
   const onSubmit = (values: FormValues) => {
@@ -430,81 +457,7 @@ export default function MissingReportPage() {
                 <Separator />
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  {/* Biển số xe */}
-                  <FormField
-                    control={form.control}
-                    name="licensePlate"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Biển số xe</FormLabel>
-                        <FormControl>
-                          <Input
-                            placeholder="Ví dụ: 59A-12345.67"
-                            {...field}
-                            disabled={!!watchIdentifier || isFormLoading}
-                            onChange={(e) => {
-                              field.onChange(e);
-                              // Tự động định dạng biển số về chữ hoa
-                              e.target.value = e.target.value.toUpperCase();
-                              if (
-                                e.target.value &&
-                                form.formState.errors.licensePlate
-                              ) {
-                                form.clearErrors("licensePlate");
-                              }
-                            }}
-                            className={
-                              form.formState.errors.licensePlate
-                                ? "border-red-300"
-                                : ""
-                            }
-                          />
-                        </FormControl>
-                        <FormDescription>
-                          Nhập biển số xe hoặc identifier (bắt buộc chọn một)
-                        </FormDescription>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  {/* Identifier */}
-                  <FormField
-                    control={form.control}
-                    name="identifier"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Identifier</FormLabel>
-                        <FormControl>
-                          <Input
-                            placeholder="Nhập identifier nếu không có biển số"
-                            {...field}
-                            disabled={!!watchLicensePlate || isFormLoading}
-                            onChange={(e) => {
-                              field.onChange(e);
-                              if (
-                                e.target.value &&
-                                form.formState.errors.identifier
-                              ) {
-                                form.clearErrors("identifier");
-                              }
-                            }}
-                            className={
-                              form.formState.errors.identifier
-                                ? "border-red-300"
-                                : ""
-                            }
-                          />
-                        </FormControl>
-                        <FormDescription>
-                          Dùng cho xe không có biển số
-                        </FormDescription>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  {/* Loại xe */}
+                  {/* Loại xe - đưa lên đầu */}
                   <FormField
                     control={form.control}
                     name="vehicleTypeId"
@@ -535,20 +488,17 @@ export default function MissingReportPage() {
                           <SelectContent>
                             {vehicleTypes.map((type) => (
                               <SelectItem key={type.id} value={type.id}>
-                                {type.name}
+                                {type.vietnameseName || type.name}
                               </SelectItem>
                             ))}
                           </SelectContent>
                         </Select>
-                        <FormDescription>
-                          Chọn loại xe đúng với lúc xe vào bãi
-                        </FormDescription>
                         <FormMessage />
                       </FormItem>
                     )}
                   />
 
-                  {/* Hãng xe */}
+                  {/* Hãng xe - đưa lên thứ hai */}
                   <FormField
                     control={form.control}
                     name="brand"
@@ -562,6 +512,82 @@ export default function MissingReportPage() {
                             disabled={isFormLoading}
                             className={
                               form.formState.errors.brand
+                                ? "border-red-300"
+                                : ""
+                            }
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  {/* Biển số xe */}
+                  <FormField
+                    control={form.control}
+                    name="licensePlate"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Biển số xe</FormLabel>
+                        <FormControl>
+                          <Input
+                            placeholder="Ví dụ: 59A-12345.67"
+                            {...field}
+                            disabled={
+                              isFormLoading ||
+                              isBicycle || // Disable nếu là xe đạp
+                              !!watchIdentifier // Hoặc đã nhập identifier
+                            }
+                            onChange={(e) => {
+                              field.onChange(e);
+                              // Tự động định dạng biển số về chữ hoa
+                              e.target.value = e.target.value.toUpperCase();
+                              if (
+                                e.target.value &&
+                                form.formState.errors.licensePlate
+                              ) {
+                                form.clearErrors("licensePlate");
+                              }
+                            }}
+                            className={
+                              form.formState.errors.licensePlate
+                                ? "border-red-300"
+                                : ""
+                            }
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  {/* Identifier */}
+                  <FormField
+                    control={form.control}
+                    name="identifier"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Identifier</FormLabel>
+                        <FormControl>
+                          <Input
+                            placeholder="Nhập identifier nếu không có biển số"
+                            {...field}
+                            disabled={
+                              isFormLoading ||
+                              isMotorizedVehicle || // Disable nếu là xe máy/tay ga
+                              !!watchLicensePlate // Hoặc đã nhập biển số
+                            }
+                            onChange={(e) => {
+                              field.onChange(e);
+                              if (
+                                e.target.value &&
+                                form.formState.errors.identifier
+                              ) {
+                                form.clearErrors("identifier");
+                              }
+                            }}
+                            className={
+                              form.formState.errors.identifier
                                 ? "border-red-300"
                                 : ""
                             }
@@ -871,7 +897,8 @@ export default function MissingReportPage() {
 
                   <div className="text-slate-500">Loại xe:</div>
                   <div className="font-medium">
-                    {reportResult.vehicleType.name}
+                    {vehicleTypeNameMap[reportResult.vehicleType.name] ||
+                      reportResult.vehicleType.name}
                   </div>
 
                   <div className="text-slate-500">Mã thẻ:</div>
