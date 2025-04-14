@@ -302,9 +302,9 @@ export default function MissingReportsPage() {
     <div className="w-full px-4 py-6">
       {/* Header */}
       <div className="mb-8">
-        <h1 className="text-3xl font-bold mb-2">Lịch sử báo cáo mất xe</h1>
+        <h1 className="text-3xl font-bold mb-2">Lịch sử báo cáo mất thẻ gửi xe</h1>
         <p className="text-gray-500">
-          Danh sách các báo cáo mất xe đã được ghi nhận trong hệ thống
+          Danh sách các báo cáo mất thẻ xe đã được ghi nhận trong hệ thống
         </p>
       </div>
 
@@ -650,7 +650,7 @@ export default function MissingReportsPage() {
       <Dialog open={detailDialogOpen} onOpenChange={setDetailDialogOpen}>
         <DialogContent className="sm:max-w-[600px]">
           <DialogHeader>
-            <DialogTitle>Chi tiết báo cáo mất xe</DialogTitle>
+            <DialogTitle>Chi tiết báo cáo mất thẻ xe</DialogTitle>
             <DialogDescription>
               Thông tin chi tiết về báo cáo mất xe
             </DialogDescription>
