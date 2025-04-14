@@ -100,8 +100,27 @@ interface RegisterCardResponse {
   };
 }
 
-const isNotBicycle = (vehicleType: VehicleType) => {
-  return !vehicleType.name.toLowerCase().includes("bicycle");
+// Thay đổi hàm isNotBicycle thành hàm lọc chỉ xe máy và xe tay ga
+const isAllowedVehicleType = (vehicleType: VehicleType) => {
+  const name = vehicleType.name.toLowerCase();
+  return (
+    name.includes("motorbike") ||
+    (name.includes("scooter") && !name.includes("electric"))
+  );
+};
+
+// Thêm hàm dịch tiếng Việt cho loại xe
+const translateVehicleType = (typeName: string): string => {
+  const vehicleTypeMap: Record<string, string> = {
+    Motorbike: "Xe máy",
+    Scooter: "Xe tay ga",
+    Car: "Ô tô",
+    Bicycle: "Xe đạp",
+    "Electric Scooter": "Xe điện",
+    "Electric Bicycle": "Xe đạp điện",
+  };
+
+  return vehicleTypeMap[typeName] || typeName;
 };
 
 // Schema xác thực form với Zod
@@ -279,12 +298,13 @@ export default function MonthlyCardRegistrationPage() {
         if (!data) return;
 
         if (data.code === 1000 && data.result) {
-          const filteredTypes = data.result.filter(isNotBicycle);
-          setVehicleTypes(data.result);
+          // Lọc chỉ lấy xe máy và xe tay ga
+          const filteredTypes = data.result.filter(isAllowedVehicleType);
+          setVehicleTypes(filteredTypes);
 
           // Đặt giá trị mặc định cho loại xe nếu có dữ liệu
           if (filteredTypes.length > 0) {
-            form.setValue("vehicleTypeId", data.result[0].id);
+            form.setValue("vehicleTypeId", filteredTypes[0].id);
           }
         } else {
           throw new Error(data.message || "Không thể lấy danh sách loại xe");
@@ -402,7 +422,7 @@ export default function MonthlyCardRegistrationPage() {
     <div className="container mx-auto p-4 max-w-4xl">
       <Card>
         <CardHeader>
-          <CardTitle className="text-2xl">Đăng ký thẻ tháng</CardTitle>
+          <CardTitle className="text-2xl font-bold">Đăng ký thẻ tháng</CardTitle>
           <CardDescription>
             Nhập thông tin để đăng ký thẻ tháng mới
           </CardDescription>
@@ -802,7 +822,7 @@ export default function MonthlyCardRegistrationPage() {
                           <SelectContent>
                             {vehicleTypes.map((type) => (
                               <SelectItem key={type.id} value={type.id}>
-                                {type.name}
+                                {translateVehicleType(type.name)}
                               </SelectItem>
                             ))}
                           </SelectContent>
@@ -928,9 +948,11 @@ export default function MonthlyCardRegistrationPage() {
 
                         <div className="text-slate-500">Loại xe:</div>
                         <div className="font-medium">
-                          {vehicleTypes.find(
-                            (t) => t.id === formData.vehicleTypeId
-                          )?.name || ""}
+                          {translateVehicleType(
+                            vehicleTypes.find(
+                              (t) => t.id === formData.vehicleTypeId
+                            )?.name || ""
+                          )}
                         </div>
 
                         <div className="text-slate-500">Hãng xe:</div>
@@ -1060,7 +1082,9 @@ export default function MonthlyCardRegistrationPage() {
 
                         <div className="text-slate-500">Loại xe:</div>
                         <div className="font-medium">
-                          {registrationResult.vehicle.type.name}
+                          {translateVehicleType(
+                            registrationResult.vehicle.type.name
+                          )}
                         </div>
 
                         <div className="text-slate-500">Hãng xe:</div>
