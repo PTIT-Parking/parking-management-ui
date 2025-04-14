@@ -114,10 +114,7 @@ const translateVehicleType = (typeName: string): string => {
   const vehicleTypeMap: Record<string, string> = {
     Motorbike: "Xe máy",
     Scooter: "Xe tay ga",
-    Car: "Ô tô",
     Bicycle: "Xe đạp",
-    "Electric Scooter": "Xe điện",
-    "Electric Bicycle": "Xe đạp điện",
   };
 
   return vehicleTypeMap[typeName] || typeName;
