@@ -138,7 +138,15 @@ export function AuthProvider({ children }: Readonly<{ children: ReactNode }>) {
       const data = await response.json();
 
       if (data.code !== 1000 || !data.result?.token) {
-        throw new Error(data.message || "Đăng nhập không thành công");
+        if (data.message == "Invalid username or password") {
+          throw new Error("Sai tài khoản hoặc mật khẩu");
+        }
+        else if (data.message == "Staff status has been disabled") {
+          throw new Error("Nhân viên không còn hoạt động");
+        }
+        else {
+          throw new Error("Đăng nhập không thành công");
+        }
       }
 
       // Lưu token vào cả cookies và localStorage

@@ -92,7 +92,7 @@ export default function PaymentHistoryPage() {
 
   // State cho bộ lọc loại thanh toán
   const [paymentTypeFilter, setPaymentTypeFilter] = useState<
-    "all" | "PARKING" | "MONTHLY"
+    "all" | "PARKING" | "MONTHLY" | "MISSING"
   >("all");
 
   // Hàm lấy dữ liệu cho ngày đã chọn
@@ -320,7 +320,7 @@ export default function PaymentHistoryPage() {
                 <CreditCard className="h-5 w-5 text-green-600" />
               </div>
               <div>
-                <p className="text-sm text-muted-foreground">Thẻ ngày</p>
+                <p className="text-sm text-muted-foreground">Gửi xe</p>
                 <p className="text-2xl font-bold">
                   {parkingPayments.length}{" "}
                   <span className="text-sm font-normal text-muted-foreground">
@@ -339,7 +339,7 @@ export default function PaymentHistoryPage() {
                 <CalendarIcon className="h-5 w-5 text-purple-600" />
               </div>
               <div>
-                <p className="text-sm text-muted-foreground">Thẻ tháng</p>
+                <p className="text-sm text-muted-foreground">Đăng ký tháng</p>
                 <p className="text-2xl font-bold">
                   {monthlyPayments.length}{" "}
                   <span className="text-sm font-normal text-muted-foreground">
@@ -396,7 +396,9 @@ export default function PaymentHistoryPage() {
               <Select
                 value={paymentTypeFilter}
                 onValueChange={(value) =>
-                  setPaymentTypeFilter(value as "all" | "PARKING" | "MONTHLY")
+                  setPaymentTypeFilter(
+                    value as "all" | "PARKING" | "MONTHLY" | "MISSING"
+                  )
                 }
               >
                 <SelectTrigger className="w-[180px]">
@@ -404,8 +406,9 @@ export default function PaymentHistoryPage() {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">Tất cả</SelectItem>
-                  <SelectItem value="PARKING">Thẻ ngày</SelectItem>
-                  <SelectItem value="MONTHLY">Thẻ tháng</SelectItem>
+                  <SelectItem value="PARKING">Gửi xe</SelectItem>
+                  <SelectItem value="MONTHLY">Đăng ký tháng</SelectItem>
+                  <SelectItem value="MISSING">Mất thẻ</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -476,11 +479,11 @@ export default function PaymentHistoryPage() {
                         <div className="flex justify-center">
                           {payment.paymentType === "PARKING" ? (
                             <Badge className="bg-green-100 text-green-800 border-green-200 hover:bg-green-100">
-                              Thẻ ngày
+                              Gửi xe
                             </Badge>
                           ) : payment.paymentType === "MONTHLY" ? (
                             <Badge className="bg-purple-100 text-purple-800 border-purple-200 hover:bg-purple-100">
-                              Thẻ tháng
+                              Đăng ký tháng
                             </Badge>
                           ) : payment.paymentType === "MISSING" ? (
                             <Badge className="bg-red-100 text-red-800 border-red-200 hover:bg-red-100">
