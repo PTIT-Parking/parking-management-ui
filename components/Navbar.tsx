@@ -31,7 +31,7 @@ const Navbar = ({ children }: NavbarProps) => {
   const dashboardUrl =
     user?.role === "ADMIN" ? "/admin/dashboard" : "/staff/dashboard";
 
-  const staffProfileUrl = "/staff/my-info";
+  const profileUrl = user?.role === "ADMIN" ? "/admin/my-info" : "/staff/my-info";
 
   const handleLogout = async () => {
     try {
@@ -81,7 +81,7 @@ const Navbar = ({ children }: NavbarProps) => {
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuItem>
-              <Link href={staffProfileUrl} className="w-full flex items-center">
+              <Link href={profileUrl} className="w-full flex items-center">
                 <UserCircle className="mr-2 h-4 w-4" />
                 <span>Hồ sơ cá nhân</span>
               </Link>

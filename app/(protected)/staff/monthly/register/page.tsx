@@ -419,7 +419,9 @@ export default function MonthlyCardRegistrationPage() {
     <div className="container mx-auto p-4 max-w-4xl">
       <Card>
         <CardHeader>
-          <CardTitle className="text-2xl font-bold">Đăng ký thẻ tháng</CardTitle>
+          <CardTitle className="text-2xl font-bold">
+            Đăng ký thẻ tháng
+          </CardTitle>
           <CardDescription>
             Nhập thông tin để đăng ký thẻ tháng mới
           </CardDescription>
@@ -993,49 +995,74 @@ export default function MonthlyCardRegistrationPage() {
 
       {/* Dialog thành công */}
       <AlertDialog open={showSuccessDialog} onOpenChange={setShowSuccessDialog}>
-        <AlertDialogContent className="max-w-2xl">
+        <AlertDialogContent className="max-w-6xl w-[98vw] overflow-y-auto max-h-[95vh]">
           <AlertDialogHeader>
             <AlertDialogTitle className="flex items-center text-green-600">
               <Check className="mr-2 h-5 w-5" />
               Đăng ký thẻ tháng thành công
             </AlertDialogTitle>
             <AlertDialogDescription asChild>
-              <div className="space-y-4">
-                <p>Thẻ tháng đã được đăng ký thành công!</p>
+              <div>
+                <p className="mb-4">Thẻ tháng đã được đăng ký thành công!</p>
 
                 {registrationResult && (
-                  <>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     {/* Thông tin thẻ */}
-                    <div className="bg-slate-50 p-4 rounded-md space-y-4 text-sm">
+                    <div className="bg-slate-50 p-5 rounded-md space-y-4 text-sm">
                       <div className="text-lg font-semibold text-slate-800">
                         Thông tin đăng ký tháng
                       </div>
-                      <div className="grid grid-cols-2 gap-2">
+                      <div className="grid grid-cols-2 gap-3">
                         <div className="text-slate-500">Ngày đăng ký:</div>
-                        <div className="font-medium">
+                        <div className="font-medium break-words">
                           {formatDate(registrationResult.issueDate)}
                         </div>
 
                         <div className="text-slate-500">Ngày hết hạn:</div>
-                        <div className="font-medium">
+                        <div className="font-medium break-words">
                           {formatDate(registrationResult.expirationDate)}
                         </div>
                       </div>
                     </div>
 
+                    {/* Thông tin thanh toán */}
+                    <div className="bg-slate-50 p-5 rounded-md space-y-4 text-sm">
+                      <div className="text-lg font-semibold text-slate-800">
+                        Thông tin thanh toán
+                      </div>
+                      <div className="grid grid-cols-2 gap-3">
+                        <div className="text-slate-500">Số tiền:</div>
+                        <div className="font-medium text-green-600 break-words">
+                          {formatCurrency(registrationResult.payment.amount)}
+                        </div>
+
+                        <div className="text-slate-500">
+                          Thời gian thanh toán:
+                        </div>
+                        <div className="font-medium break-words">
+                          {formatDate(registrationResult.payment.createAt)}
+                        </div>
+
+                        <div className="text-slate-500">Loại thanh toán:</div>
+                        <div className="font-medium break-words">
+                          Phí thẻ tháng
+                        </div>
+                      </div>
+                    </div>
+
                     {/* Thông tin khách hàng */}
-                    <div className="bg-slate-50 p-4 rounded-md space-y-4 text-sm">
+                    <div className="bg-slate-50 p-5 rounded-md space-y-4 text-sm">
                       <div className="text-lg font-semibold text-slate-800">
                         Thông tin khách hàng
                       </div>
-                      <div className="grid grid-cols-2 gap-2">
+                      <div className="grid grid-cols-2 gap-3">
                         <div className="text-slate-500">Họ tên:</div>
-                        <div className="font-medium">
+                        <div className="font-medium break-words">
                           {registrationResult.customer.name}
                         </div>
 
                         <div className="text-slate-500">Loại khách hàng:</div>
-                        <div className="font-medium">
+                        <div className="font-medium break-words">
                           {registrationResult.customer.customerType ===
                           "LECTURER"
                             ? "Giảng viên"
@@ -1043,82 +1070,59 @@ export default function MonthlyCardRegistrationPage() {
                         </div>
 
                         <div className="text-slate-500">Giới tính:</div>
-                        <div className="font-medium">
+                        <div className="font-medium break-words">
                           {registrationResult.customer.gender === "MALE"
                             ? "Nam"
                             : "Nữ"}
                         </div>
 
                         <div className="text-slate-500">Số điện thoại:</div>
-                        <div className="font-medium">
+                        <div className="font-medium break-words">
                           {registrationResult.customer.phoneNumber}
                         </div>
 
                         <div className="text-slate-500">Email:</div>
-                        <div className="font-medium">
+                        <div className="font-medium break-words">
                           {registrationResult.customer.email}
                         </div>
 
                         <div className="text-slate-500">Địa chỉ:</div>
-                        <div className="font-medium">
+                        <div className="font-medium break-words">
                           {registrationResult.customer.address}
                         </div>
                       </div>
                     </div>
 
                     {/* Thông tin xe */}
-                    <div className="bg-slate-50 p-4 rounded-md space-y-4 text-sm">
+                    <div className="bg-slate-50 p-5 rounded-md space-y-4 text-sm">
                       <div className="text-lg font-semibold text-slate-800">
                         Thông tin xe
                       </div>
-                      <div className="grid grid-cols-2 gap-2">
+                      <div className="grid grid-cols-2 gap-3">
                         <div className="text-slate-500">Biển số xe:</div>
-                        <div className="font-medium">
+                        <div className="font-medium break-words">
                           {registrationResult.vehicle.licensePlate}
                         </div>
 
                         <div className="text-slate-500">Loại xe:</div>
-                        <div className="font-medium">
+                        <div className="font-medium break-words">
                           {translateVehicleType(
                             registrationResult.vehicle.type.name
                           )}
                         </div>
 
                         <div className="text-slate-500">Hãng xe:</div>
-                        <div className="font-medium">
+                        <div className="font-medium break-words">
                           {registrationResult.vehicle.brand}
                         </div>
 
                         <div className="text-slate-500">Màu xe:</div>
-                        <div className="font-medium">
+                        <div className="font-medium break-words">
                           {registrationResult.vehicle.color}
                         </div>
                       </div>
                     </div>
-
-                    {/* Thông tin thanh toán */}
-                    <div className="bg-slate-50 p-4 rounded-md space-y-4 text-sm">
-                      <div className="text-lg font-semibold text-slate-800">
-                        Thông tin thanh toán
-                      </div>
-                      <div className="grid grid-cols-2 gap-2">
-                        <div className="text-slate-500">Số tiền:</div>
-                        <div className="font-medium text-green-600">
-                          {formatCurrency(registrationResult.payment.amount)}
-                        </div>
-
-                        <div className="text-slate-500">
-                          Thời gian thanh toán:
-                        </div>
-                        <div className="font-medium">
-                          {formatDate(registrationResult.payment.createAt)}
-                        </div>
-
-                        <div className="text-slate-500">Loại thanh toán:</div>
-                        <div className="font-medium">Phí thẻ tháng</div>
-                      </div>
-                    </div>
-                  </>
+                  </div>
                 )}
               </div>
             </AlertDialogDescription>
