@@ -42,7 +42,6 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
-  CardFooter,
 } from "@/components/ui/card";
 import {
   DropdownMenu,
@@ -54,6 +53,15 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { MaterialIcon } from "@/components/Icon";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationEllipsis,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
 import { API_ENDPOINTS, buildApiUrl } from "@/config/api";
 
 // Định nghĩa kiểu dữ liệu
@@ -120,6 +128,10 @@ export default function ListActiveMonthlyCards() {
   const [isLoading, setIsLoading] = useState(true);
   const [sortOption, setSortOption] = useState<string>("name");
   const [filterType, setFilterType] = useState<string>("all");
+
+  // Các state cho phân trang
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage] = useState(10);
 
   // Tính số ngày còn lại của thẻ
   const calculateRemainingDays = (expirationDate: string) => {
@@ -208,6 +220,21 @@ export default function ListActiveMonthlyCards() {
       }
     });
 
+  // Tính toán dữ liệu phân trang
+  const totalItems = filteredAndSortedCards.length;
+  const totalPages = Math.ceil(totalItems / itemsPerPage);
+
+  // Cắt dữ liệu cho trang hiện tại
+  const currentPageItems = filteredAndSortedCards.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
+
+  // Hàm chuyển trang
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
+
   // Hiển thị chi tiết thẻ
   const handleShowDetails = (card: MonthlyCard) => {
     setSelectedCard(card);
@@ -217,11 +244,13 @@ export default function ListActiveMonthlyCards() {
   // Áp dụng bộ lọc
   const handleFilter = (filter: string) => {
     setFilterType(filter);
+    setCurrentPage(1); // Reset về trang đầu tiên khi thay đổi bộ lọc
   };
 
   // Áp dụng sắp xếp
   const handleSort = (sort: string) => {
     setSortOption(sort);
+    setCurrentPage(1); // Reset về trang đầu tiên khi thay đổi sắp xếp
   };
 
   // Lấy icon cho loại xe
@@ -341,7 +370,10 @@ export default function ListActiveMonthlyCards() {
                 placeholder="Tìm theo tên hoặc biển số xe..."
                 className="pl-8"
                 value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
+                onChange={(e) => {
+                  setSearchTerm(e.target.value);
+                  setCurrentPage(1); // Reset trang khi tìm kiếm
+                }}
               />
             </div>
             <div className="flex gap-2">
@@ -413,128 +445,230 @@ export default function ListActiveMonthlyCards() {
               <Loader2 className="h-8 w-8 animate-spin text-primary" />
             </div>
           ) : filteredAndSortedCards.length > 0 ? (
-            <div className="rounded-md border overflow-hidden">
-              <Table>
-                <TableHeader className="bg-slate-50">
-                  <TableRow>
-                    <TableHead className="w-[5%] text-center">STT</TableHead>
-                    <TableHead className="w-[15%] text-center">
-                      Họ tên
-                    </TableHead>
-                    <TableHead className="w-[15%] text-center">
-                      Loại khách hàng
-                    </TableHead>
-                    <TableHead className="w-[15%] text-center">
-                      Biển số xe
-                    </TableHead>
-                    <TableHead className="w-[15%] text-center">
-                      Loại xe
-                    </TableHead>
-                    <TableHead className="w-[15%] text-center">
-                      Ngày hết hạn
-                    </TableHead>
-                    <TableHead className="w-[15%] text-center">
-                      Thời hạn còn lại
-                    </TableHead>
-                    <TableHead className="w-[5%] text-center"></TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {filteredAndSortedCards.map((card, index) => (
-                    <TableRow
-                      key={card.id}
-                      className={
-                        index % 2 === 0 ? "bg-white" : "bg-slate-50/50"
-                      }
-                    >
-                      <TableCell className="text-center text-slate-500">
-                        {index + 1}
-                      </TableCell>
-                      <TableCell className="font-medium">
-                        <div className="flex items-center justify-center gap-2">
-                          <User
-                            className={`h-4 w-4 ${
-                              card.customer.customerType === "LECTURER"
-                                ? "text-purple-600"
-                                : "text-cyan-600"
-                            }`}
-                          />
-                          {card.customer.name}
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex items-center justify-center">
-                          <Badge
-                            variant="outline"
-                            className={getCustomerTypeColor(
-                              card.customer.customerType
-                            )}
-                          >
-                            {card.customer.customerType === "LECTURER"
-                              ? "Giảng viên"
-                              : "Sinh viên"}
-                          </Badge>
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex items-center justify-center">
-                          {card.vehicle.licensePlate}
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex items-center justify-center gap-2">
-                          <Badge
-                            variant="outline"
-                            className={getVehicleTypeColor(
-                              card.vehicle.type.name
-                            )}
-                          >
-                            <span className="flex items-center">
-                              {getVehicleTypeIcon(card.vehicle.type.name)}
-                              <span className="ml-1">
-                                {card.vehicle.type.name}
-                              </span>
-                            </span>
-                          </Badge>
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex items-center justify-center">
-                          <Calendar className="h-3.5 w-3.5 mr-1.5 text-slate-400" />
-                          {formatDate(card.expirationDate)}
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex items-center justify-center">
-                          <Badge
-                            className={`${
-                              calculateRemainingDays(card.expirationDate) <= 7
-                                ? "bg-red-100 text-red-800 border border-red-200"
-                                : calculateRemainingDays(card.expirationDate) <=
-                                  30
-                                ? "bg-yellow-100 text-yellow-800 border border-yellow-200"
-                                : "bg-green-100 text-green-800 border border-green-200"
-                            }`}
-                          >
-                            <Clock className="h-3.5 w-3.5 mr-1" />
-                            {calculateRemainingDays(card.expirationDate)} ngày
-                          </Badge>
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => handleShowDetails(card)}
-                          title="Xem chi tiết"
-                        >
-                          <Info className="h-4 w-4" />
-                        </Button>
-                      </TableCell>
+            <div className="space-y-4">
+              <div className="rounded-md border overflow-hidden">
+                <Table>
+                  <TableHeader className="bg-slate-50">
+                    <TableRow>
+                      <TableHead className="w-[5%] text-center">STT</TableHead>
+                      <TableHead className="w-[15%] text-center">
+                        Họ tên
+                      </TableHead>
+                      <TableHead className="w-[15%] text-center">
+                        Loại khách hàng
+                      </TableHead>
+                      <TableHead className="w-[15%] text-center">
+                        Biển số xe
+                      </TableHead>
+                      <TableHead className="w-[15%] text-center">
+                        Loại xe
+                      </TableHead>
+                      <TableHead className="w-[15%] text-center">
+                        Ngày hết hạn
+                      </TableHead>
+                      <TableHead className="w-[15%] text-center">
+                        Thời hạn còn lại
+                      </TableHead>
+                      <TableHead className="w-[5%] text-center"></TableHead>
                     </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
+                  </TableHeader>
+                  <TableBody>
+                    {currentPageItems.map((card, index) => (
+                      <TableRow
+                        key={card.id}
+                        className={
+                          index % 2 === 0 ? "bg-white" : "bg-slate-50/50"
+                        }
+                      >
+                        <TableCell className="text-center text-slate-500">
+                          {(currentPage - 1) * itemsPerPage + index + 1}
+                        </TableCell>
+                        <TableCell className="font-medium">
+                          <div className="flex items-center justify-center gap-2">
+                            <User
+                              className={`h-4 w-4 ${
+                                card.customer.customerType === "LECTURER"
+                                  ? "text-purple-600"
+                                  : "text-cyan-600"
+                              }`}
+                            />
+                            {card.customer.name}
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <div className="flex items-center justify-center">
+                            <Badge
+                              variant="outline"
+                              className={getCustomerTypeColor(
+                                card.customer.customerType
+                              )}
+                            >
+                              {card.customer.customerType === "LECTURER"
+                                ? "Giảng viên"
+                                : "Sinh viên"}
+                            </Badge>
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <div className="flex items-center justify-center">
+                            {card.vehicle.licensePlate}
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <div className="flex items-center justify-center gap-2">
+                            <Badge
+                              variant="outline"
+                              className={getVehicleTypeColor(
+                                card.vehicle.type.name
+                              )}
+                            >
+                              <span className="flex items-center">
+                                {getVehicleTypeIcon(card.vehicle.type.name)}
+                                <span className="ml-1">
+                                  {card.vehicle.type.name}
+                                </span>
+                              </span>
+                            </Badge>
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <div className="flex items-center justify-center">
+                            <Calendar className="h-3.5 w-3.5 mr-1.5 text-slate-400" />
+                            {formatDate(card.expirationDate)}
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <div className="flex items-center justify-center">
+                            <Badge
+                              className={`${
+                                calculateRemainingDays(card.expirationDate) <= 7
+                                  ? "bg-red-100 text-red-800 border border-red-200"
+                                  : calculateRemainingDays(
+                                      card.expirationDate
+                                    ) <= 30
+                                  ? "bg-yellow-100 text-yellow-800 border border-yellow-200"
+                                  : "bg-green-100 text-green-800 border border-green-200"
+                              }`}
+                            >
+                              <Clock className="h-3.5 w-3.5 mr-1" />
+                              {calculateRemainingDays(card.expirationDate)} ngày
+                            </Badge>
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => handleShowDetails(card)}
+                            title="Xem chi tiết"
+                          >
+                            <Info className="h-4 w-4" />
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+
+              {/* Phân trang và hiển thị số bản ghi trên trang */}
+              <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
+                {/* Phân trang */}
+                {totalPages > 1 && (
+                  <Pagination>
+                    <PaginationContent>
+                      <PaginationItem>
+                        <PaginationPrevious
+                          onClick={() =>
+                            currentPage > 1 && handlePageChange(currentPage - 1)
+                          }
+                          className={
+                            currentPage === 1
+                              ? "pointer-events-none opacity-50"
+                              : "cursor-pointer"
+                          }
+                        />
+                      </PaginationItem>
+
+                      {/* Trang đầu */}
+                      {currentPage > 2 && (
+                        <PaginationItem>
+                          <PaginationLink onClick={() => handlePageChange(1)}>
+                            1
+                          </PaginationLink>
+                        </PaginationItem>
+                      )}
+
+                      {/* Hiển thị dấu ... nếu cần */}
+                      {currentPage > 3 && (
+                        <PaginationItem>
+                          <PaginationEllipsis />
+                        </PaginationItem>
+                      )}
+
+                      {/* Trang trước trang hiện tại */}
+                      {currentPage > 1 && (
+                        <PaginationItem>
+                          <PaginationLink
+                            onClick={() => handlePageChange(currentPage - 1)}
+                          >
+                            {currentPage - 1}
+                          </PaginationLink>
+                        </PaginationItem>
+                      )}
+
+                      {/* Trang hiện tại */}
+                      <PaginationItem>
+                        <PaginationLink isActive>{currentPage}</PaginationLink>
+                      </PaginationItem>
+
+                      {/* Trang sau trang hiện tại */}
+                      {currentPage < totalPages && (
+                        <PaginationItem>
+                          <PaginationLink
+                            onClick={() => handlePageChange(currentPage + 1)}
+                          >
+                            {currentPage + 1}
+                          </PaginationLink>
+                        </PaginationItem>
+                      )}
+
+                      {/* Hiển thị dấu ... nếu cần */}
+                      {currentPage < totalPages - 2 && (
+                        <PaginationItem>
+                          <PaginationEllipsis />
+                        </PaginationItem>
+                      )}
+
+                      {/* Trang cuối */}
+                      {currentPage < totalPages - 1 && (
+                        <PaginationItem>
+                          <PaginationLink
+                            onClick={() => handlePageChange(totalPages)}
+                          >
+                            {totalPages}
+                          </PaginationLink>
+                        </PaginationItem>
+                      )}
+
+                      <PaginationItem>
+                        <PaginationNext
+                          onClick={() =>
+                            currentPage < totalPages &&
+                            handlePageChange(currentPage + 1)
+                          }
+                          className={
+                            currentPage === totalPages
+                              ? "pointer-events-none opacity-50"
+                              : "cursor-pointer"
+                          }
+                        />
+                      </PaginationItem>
+                    </PaginationContent>
+                  </Pagination>
+                )}
+                
+              </div>
             </div>
           ) : (
             <div className="text-center py-10 bg-slate-50 rounded-md border">
@@ -554,6 +688,7 @@ export default function ListActiveMonthlyCards() {
                   onClick={() => {
                     setSearchTerm("");
                     setFilterType("all");
+                    setCurrentPage(1);
                   }}
                 >
                   Xóa bộ lọc
@@ -562,9 +697,6 @@ export default function ListActiveMonthlyCards() {
             </div>
           )}
         </CardContent>
-        <CardFooter className="border-t p-4 text-sm text-muted-foreground">
-          Tổng số {filteredAndSortedCards.length} thẻ tháng
-        </CardFooter>
       </Card>
 
       {/* Dialog chi tiết thẻ tháng */}
