@@ -212,7 +212,11 @@ export default function GetPricePage() {
                             : "bg-green-500"
                         }`}
                       ></span>
-                      {price.type.name}
+                      {price.type.name === "Bicycle"
+                        ? "Xe đạp"
+                        : price.type.name === "Motorbike"
+                        ? "Xe máy"
+                        : "Xe tay ga"}
                     </div>
                   </TableCell>
                   <TableCell className="text-right">

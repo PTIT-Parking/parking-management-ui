@@ -156,7 +156,10 @@ export default function ParkingHistoryPage() {
       const month = date.getMonth() + 1; // getMonth() trả về 0-11
       const day = date.getDate();
 
-      const apiUrl = buildApiUrl(API_ENDPOINTS.PARKING.RECORD_HISTORY, {month, day})
+      const apiUrl = buildApiUrl(API_ENDPOINTS.PARKING.RECORD_HISTORY, {
+        month,
+        day,
+      });
       const data = await fetchWithAuth<ApiResponse>(apiUrl);
 
       if (data && data.code === 1000) {
@@ -559,9 +562,16 @@ export default function ParkingHistoryPage() {
                         {(currentPage - 1) * ITEMS_PER_PAGE + index + 1}
                       </TableCell>
                       <TableCell className="text-center font-medium">
-                        {record.licensePlate || (
+                        {record.licensePlate &&
+                        record.licensePlate.trim() !== "" ? (
+                          record.licensePlate
+                        ) : record.identifier ? (
                           <span className="text-slate-500 italic">
                             ID: {record.identifier}
+                          </span>
+                        ) : (
+                          <span className="text-slate-500 italic">
+                            Không có dữ liệu
                           </span>
                         )}
                       </TableCell>
@@ -576,7 +586,11 @@ export default function ParkingHistoryPage() {
                                 : "bg-purple-500"
                             }`}
                           ></span>
-                          {record.vehicleType.name}
+                          {record.vehicleType.name === "Bicycle"
+                            ? "Xe đạp"
+                            : record.vehicleType.name === "Motorbike"
+                            ? "Xe máy"
+                            : "Xe tay ga"}
                         </div>
                       </TableCell>
                       <TableCell className="text-center">
