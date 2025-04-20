@@ -1,36 +1,108 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# PTIT Parking Management System
+
+## Overview
+
+PTIT Parking Management System is a comprehensive solution for managing parking facilities at educational institutions. This web application provides a user-friendly interface for administrators and staff to handle daily parking operations, monthly card registrations, and generate statistical reports.
+
+## Features
+
+- **Authentication**: Secure login system with role-based access (admin/staff)
+- **Dashboard**: Overview of key metrics and real-time parking status
+- **Vehicle Management**:
+  - Entry/exit recording with license plate recognition
+  - Daily parking ticket issuance
+  - Monthly card registration and management
+- **Missing Card Reports**: Process and manage lost card incidents
+- **Statistical Reporting**:
+  - Traffic analysis with visual charts
+  - Revenue reports by period (daily/weekly/monthly)
+- **Admin Features**:
+  - Staff management
+  - Price configuration
+  - Historical data access for all transactions
+
+## Technology Stack
+
+- **Frontend**: Next.js 14 (React)
+- **UI Components**: Custom UI built with Tailwind CSS and shadcn/ui
+- **State Management**: React Hooks and Context API
+- **API Integration**: Custom fetch hooks with authentication
+- **Data Visualization**: Chart.js for statistics and reports
+
+## Project Structure
+
+```
+parking-management-ui/
+├── app/                   # Next.js app router
+│   ├── (auth)/            # Authentication pages
+│   ├── (protected)/       # Protected routes
+│   │   ├── admin/         # Admin-specific pages
+│   │   └── staff/         # Staff-specific pages
+├── components/            # Reusable UI components
+├── config/                # Configuration files
+├── hooks/                 # Custom React hooks
+├── lib/                   # Utility functions
+└── public/                # Static assets
+```
 
 ## Getting Started
 
-First, run the development server:
+### Prerequisites
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+- Node.js 18.17.0 or higher
+- npm/yarn/pnpm package manager
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### Installation
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+1. Clone the repository:
+   ```bash
+   git clone <repository-url>
+   cd parking-management-ui
+   ```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+2. Install dependencies:
+   ```bash
+   npm install
+   # or
+   yarn install
+   # or
+   pnpm install
+   ```
 
-## Learn More
+3. Run the development server:
+   ```bash
+   npm run dev
+   # or
+   yarn dev
+   # or 
+   pnpm dev
+   ```
 
-To learn more about Next.js, take a look at the following resources:
+4. Open [http://localhost:3000](http://localhost:3000) in your browser to see the application
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Deployment
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+The application can be deployed on any platform supporting Node.js applications. For the simplest deployment experience, use Vercel:
 
-## Deploy on Vercel
+1. Push your code to a Git repository
+2. Import the project in Vercel
+3. Configure environment variables as needed
+4. Deploy
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Known Issues
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- Dialog components may sometimes show double scrollbars in specific scenarios
+- Performance optimization needed for large datasets in historical records
+
+## Future Improvements
+
+- Implement real-time notifications
+- Enhance mobile responsiveness
+- Add more detailed financial reporting
+- Integrate with physical hardware (cameras, barriers)
+
+## License
+
+This project is proprietary and confidential. Unauthorized copying or distribution is prohibited.
+
+Similar code found with 1 license type
