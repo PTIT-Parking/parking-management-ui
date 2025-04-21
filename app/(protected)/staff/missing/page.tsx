@@ -427,7 +427,7 @@ export default function MissingReportPage() {
     <div className="container mx-auto p-4 space-y-6">
       <Card>
         <CardHeader>
-          <CardTitle className="font-semibold text-2xl">
+          <CardTitle className="font-bold text-2xl">
             Báo Mất Thẻ Xe
           </CardTitle>
           <CardDescription>

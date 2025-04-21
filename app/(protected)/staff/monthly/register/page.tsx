@@ -895,81 +895,77 @@ export default function MonthlyCardRegistrationPage() {
 
       {/* Dialog xác nhận */}
       <AlertDialog open={showConfirmDialog} onOpenChange={setShowConfirmDialog}>
-        <AlertDialogContent className="max-h-[85vh] overflow-y-auto">
+        <AlertDialogContent className="sm:max-w-lg">
           <AlertDialogHeader>
             <AlertDialogTitle>Xác nhận đăng ký thẻ tháng</AlertDialogTitle>
-            <AlertDialogDescription>
-              <div className="space-y-4">
-                <p>
-                  Bạn có chắc chắn muốn đăng ký thẻ tháng với thông tin sau đây?
-                </p>
+          </AlertDialogHeader>
+          <div className="overflow-y-auto" style={{ maxHeight: "60vh" }}>
+            <div className="text-sm text-muted-foreground space-y-4">
+              <p>
+                Bạn có chắc chắn muốn đăng ký thẻ tháng với thông tin sau đây?
+              </p>
 
-                {formData && (
-                  <div>
-                    {/* Thông tin khách hàng */}
-                    <div className="bg-slate-50 p-3 rounded-md space-y-2 mt-2">
-                      <div className="text-sm font-semibold text-slate-800">
-                        Thông tin khách hàng
-                      </div>
-                      <div className="grid grid-cols-2 gap-1 text-sm">
-                        <div className="text-slate-500">Họ tên:</div>
-                        <div className="font-medium">{formData.name}</div>
-
-                        <div className="text-slate-500">Loại khách hàng:</div>
-                        <div className="font-medium">
-                          {formData.customerType === "LECTURER"
-                            ? "Giảng viên"
-                            : "Sinh viên"}
-                        </div>
-
-                        <div className="text-slate-500">Thời hạn:</div>
-                        <div className="font-medium">
-                          {formData.durationInMonths} tháng
-                        </div>
-
-                        <div className="text-slate-500">Số điện thoại:</div>
-                        <div className="font-medium">
-                          {formData.phoneNumber}
-                        </div>
-                      </div>
+              {formData && (
+                <div>
+                  {/* Thông tin khách hàng */}
+                  <div className="bg-slate-50 p-3 rounded-md space-y-2 mt-2">
+                    <div className="text-sm font-semibold text-slate-800">
+                      Thông tin khách hàng
                     </div>
+                    <div className="grid grid-cols-2 gap-1 text-sm">
+                      <div className="text-slate-500">Họ tên:</div>
+                      <div className="font-medium">{formData.name}</div>
 
-                    {/* Thông tin xe */}
-                    <div className="bg-slate-50 p-3 rounded-md space-y-2 mt-3">
-                      <div className="text-sm font-semibold text-slate-800">
-                        Thông tin xe
+                      <div className="text-slate-500">Loại khách hàng:</div>
+                      <div className="font-medium">
+                        {formData.customerType === "LECTURER"
+                          ? "Giảng viên"
+                          : "Sinh viên"}
                       </div>
-                      <div className="grid grid-cols-2 gap-1 text-sm">
-                        <div className="text-slate-500">Biển số xe:</div>
-                        <div className="font-medium">
-                          {formData.licensePlate}
-                        </div>
 
-                        <div className="text-slate-500">Loại xe:</div>
-                        <div className="font-medium">
-                          {translateVehicleType(
-                            vehicleTypes.find(
-                              (t) => t.id === formData.vehicleTypeId
-                            )?.name || ""
-                          )}
-                        </div>
-
-                        <div className="text-slate-500">Hãng xe:</div>
-                        <div className="font-medium">{formData.brand}</div>
-
-                        <div className="text-slate-500">Màu xe:</div>
-                        <div className="font-medium">{formData.color}</div>
+                      <div className="text-slate-500">Thời hạn:</div>
+                      <div className="font-medium">
+                        {formData.durationInMonths} tháng
                       </div>
-                    </div>
 
-                    <div className="mt-4 text-amber-600 font-semibold">
-                      Lưu ý: Thông tin không thể thay đổi sau khi đăng ký.
+                      <div className="text-slate-500">Số điện thoại:</div>
+                      <div className="font-medium">{formData.phoneNumber}</div>
                     </div>
                   </div>
-                )}
-              </div>
-            </AlertDialogDescription>
-          </AlertDialogHeader>
+
+                  {/* Thông tin xe */}
+                  <div className="bg-slate-50 p-3 rounded-md space-y-2 mt-3">
+                    <div className="text-sm font-semibold text-slate-800">
+                      Thông tin xe
+                    </div>
+                    <div className="grid grid-cols-2 gap-1 text-sm">
+                      <div className="text-slate-500">Biển số xe:</div>
+                      <div className="font-medium">{formData.licensePlate}</div>
+
+                      <div className="text-slate-500">Loại xe:</div>
+                      <div className="font-medium">
+                        {translateVehicleType(
+                          vehicleTypes.find(
+                            (t) => t.id === formData.vehicleTypeId
+                          )?.name || ""
+                        )}
+                      </div>
+
+                      <div className="text-slate-500">Hãng xe:</div>
+                      <div className="font-medium">{formData.brand}</div>
+
+                      <div className="text-slate-500">Màu xe:</div>
+                      <div className="font-medium">{formData.color}</div>
+                    </div>
+                  </div>
+
+                  <div className="mt-4 text-amber-600 font-semibold">
+                    Lưu ý: Thông tin không thể thay đổi sau khi đăng ký.
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
           <AlertDialogFooter>
             <AlertDialogCancel disabled={loading}>Hủy bỏ</AlertDialogCancel>
             <AlertDialogAction
@@ -995,62 +991,60 @@ export default function MonthlyCardRegistrationPage() {
 
       {/* Dialog thành công */}
       <AlertDialog open={showSuccessDialog} onOpenChange={setShowSuccessDialog}>
-        <AlertDialogContent className="max-w-md max-h-[85vh] overflow-y-auto">
+        <AlertDialogContent className="sm:max-w-lg">
           <AlertDialogHeader>
             <AlertDialogTitle className="flex items-center text-green-600">
               <Check className="mr-2 h-5 w-5" />
               Đăng ký thành công
             </AlertDialogTitle>
-            <AlertDialogDescription asChild>
-              <div className="pt-2">
-                {registrationResult && (
-                  <div className="space-y-5">
-                    {/* Thông tin chính của thẻ */}
-                    <div className="bg-slate-50 p-4 rounded-md">
-                      <div className="grid grid-cols-1 gap-2">
-                        <div className="flex justify-between border-b pb-2">
-                          <span className="text-slate-500">Khách hàng:</span>
-                          <span className="font-medium text-right">
-                            {registrationResult.customer.name}
-                          </span>
-                        </div>
+          </AlertDialogHeader>
+          <div className="pt-2">
+            {registrationResult && (
+              <div className="space-y-5">
+                {/* Thông tin chính của thẻ */}
+                <div className="bg-slate-50 p-4 rounded-md">
+                  <div className="grid grid-cols-1 gap-2">
+                    <div className="flex justify-between border-b pb-2">
+                      <span className="text-slate-500">Khách hàng:</span>
+                      <span className="font-medium text-right">
+                        {registrationResult.customer.name}
+                      </span>
+                    </div>
 
-                        <div className="flex justify-between border-b pb-2">
-                          <span className="text-slate-500">Biển số xe:</span>
-                          <span className="font-medium text-right">
-                            {registrationResult.vehicle.licensePlate}
-                          </span>
-                        </div>
+                    <div className="flex justify-between border-b pb-2">
+                      <span className="text-slate-500">Biển số xe:</span>
+                      <span className="font-medium text-right">
+                        {registrationResult.vehicle.licensePlate}
+                      </span>
+                    </div>
 
-                        <div className="flex justify-between border-b pb-2">
-                          <span className="text-slate-500">Loại xe:</span>
-                          <span className="font-medium text-right">
-                            {translateVehicleType(
-                              registrationResult.vehicle.type.name
-                            )}
-                          </span>
-                        </div>
+                    <div className="flex justify-between border-b pb-2">
+                      <span className="text-slate-500">Loại xe:</span>
+                      <span className="font-medium text-right">
+                        {translateVehicleType(
+                          registrationResult.vehicle.type.name
+                        )}
+                      </span>
+                    </div>
 
-                        <div className="flex justify-between border-b pb-2">
-                          <span className="text-slate-500">Hiệu lực đến:</span>
-                          <span className="font-medium text-right">
-                            {formatDate(registrationResult.expirationDate)}
-                          </span>
-                        </div>
+                    <div className="flex justify-between border-b pb-2">
+                      <span className="text-slate-500">Hiệu lực đến:</span>
+                      <span className="font-medium text-right">
+                        {formatDate(registrationResult.expirationDate)}
+                      </span>
+                    </div>
 
-                        <div className="flex justify-between">
-                          <span className="text-slate-500">Số tiền:</span>
-                          <span className="font-medium text-right text-green-600">
-                            {formatCurrency(registrationResult.payment.amount)}
-                          </span>
-                        </div>
-                      </div>
+                    <div className="flex justify-between">
+                      <span className="text-slate-500">Số tiền:</span>
+                      <span className="font-medium text-right text-green-600">
+                        {formatCurrency(registrationResult.payment.amount)}
+                      </span>
                     </div>
                   </div>
-                )}
+                </div>
               </div>
-            </AlertDialogDescription>
-          </AlertDialogHeader>
+            )}
+          </div>
           <AlertDialogFooter className="mt-4">
             <AlertDialogAction
               onClick={handleNewRegistration}

@@ -12,7 +12,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { User, LogOut, UserCircle } from "lucide-react";
+import { User, LogOut, UserCircle, Lock } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { toast } from "sonner";
 
@@ -31,7 +31,8 @@ const Navbar = ({ children }: NavbarProps) => {
   const dashboardUrl =
     user?.role === "ADMIN" ? "/admin/dashboard" : "/staff/dashboard";
 
-  const profileUrl = user?.role === "ADMIN" ? "/admin/my-info" : "/staff/my-info";
+  const profileUrl =
+    user?.role === "ADMIN" ? "/admin/my-info" : "/staff/my-info";
 
   const handleLogout = async () => {
     try {
@@ -84,6 +85,20 @@ const Navbar = ({ children }: NavbarProps) => {
               <Link href={profileUrl} className="w-full flex items-center">
                 <UserCircle className="mr-2 h-4 w-4" />
                 <span>Hồ sơ cá nhân</span>
+              </Link>
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem>
+              <Link
+                href={
+                  user?.role === "ADMIN"
+                    ? "/admin/change-password"
+                    : "/staff/change-password"
+                }
+                className="w-full flex items-center"
+              >
+                <Lock className="mr-2 h-4 w-4" />
+                <span>Đổi mật khẩu</span>
               </Link>
             </DropdownMenuItem>
             <DropdownMenuSeparator />
