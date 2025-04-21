@@ -7,7 +7,8 @@ export const API_ENDPOINTS = {
   AUTH: {
     LOGIN: '/auth/login',
     LOGOUT:'/auth/logout',
-    MY_INFO: '/auth/my-info'
+    MY_INFO: '/auth/my-info',
+    CHANGE_PASSWORD: "/auth/change-password"
   },
   
   // Parking
