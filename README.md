@@ -6,44 +6,59 @@ PTIT Parking Management System is a comprehensive solution for managing parking 
 
 ## Features
 
-- **Authentication**: Secure login system with role-based access (admin/staff)
+- **Authentication**:
+  - Secure login system with role-based access (admin/staff)
+  - Password reset and recovery via email
+  - Change password functionality for logged-in users
+  
 - **Dashboard**: Overview of key metrics and real-time parking status
+
 - **Vehicle Management**:
   - Entry/exit recording with license plate recognition
   - Daily parking ticket issuance
   - Monthly card registration and management
+
+- **User Account Management**:
+  - Password reset via email link
+  - Secure token-based authentication
+  - Account recovery options
+
 - **Missing Card Reports**: Process and manage lost card incidents
+
 - **Statistical Reporting**:
   - Traffic analysis with visual charts
   - Revenue reports by period (daily/weekly/monthly)
+  
 - **Admin Features**:
   - Staff management
   - Price configuration
   - Historical data access for all transactions
 
+- **Security Features**:
+  - JWT-based authentication
+  - Secure password handling
+  - Form validation and error handling
+
 ## Technology Stack
 
-- **Frontend**: Next.js 14 (React)
+- **Frontend**: Next.js 14 (App Router) with React
 - **UI Components**: Custom UI built with Tailwind CSS and shadcn/ui
-- **State Management**: React Hooks and Context API
-- **API Integration**: Custom fetch hooks with authentication
+- **Form Handling**:
+  - React Hook Form
+  - Zod for schema validation
+- **State Management**: 
+  - React Hooks and Context API
+  - Custom authentication hooks
+- **API Integration**: 
+  - Custom fetch hooks with authentication
+  - Error handling with specific status codes
 - **Data Visualization**: Chart.js for statistics and reports
-
-## Project Structure
-
-```
-parking-management-ui/
-├── app/                   # Next.js app router
-│   ├── (auth)/            # Authentication pages
-│   ├── (protected)/       # Protected routes
-│   │   ├── admin/         # Admin-specific pages
-│   │   └── staff/         # Staff-specific pages
-├── components/            # Reusable UI components
-├── config/                # Configuration files
-├── hooks/                 # Custom React hooks
-├── lib/                   # Utility functions
-└── public/                # Static assets
-```
+- **Icons and UI Elements**:
+  - Lucide React icons
+  - Toast notifications with Sonner
+- **Modal and Dialog Components**: 
+  - AlertDialog for confirmations
+  - Custom modals for user interactions
 
 ## Getting Started
 
@@ -80,6 +95,15 @@ parking-management-ui/
 
 4. Open [http://localhost:3000](http://localhost:3000) in your browser to see the application
 
+## Authentication Flow
+
+1. **Login**: Users authenticate through the login form
+2. **Password Recovery**:
+   - User requests password reset with username and email
+   - System sends a reset link with a secure token
+   - Token validation occurs before allowing password reset
+   - Confirmation required before finalizing password changes
+
 ## Deployment
 
 The application can be deployed on any platform supporting Node.js applications. For the simplest deployment experience, use Vercel:
@@ -100,9 +124,4 @@ The application can be deployed on any platform supporting Node.js applications.
 - Enhance mobile responsiveness
 - Add more detailed financial reporting
 - Integrate with physical hardware (cameras, barriers)
-
-## License
-
-This project is proprietary and confidential. Unauthorized copying or distribution is prohibited.
-
-Similar code found with 1 license type
+- Two-factor authentication
