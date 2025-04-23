@@ -12,12 +12,18 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardFooter,
+} from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import { Eye, EyeOff } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
+import Link from "next/link";
 
 const formSchema = z.object({
   username: z.string().min(1, {
@@ -53,7 +59,6 @@ const LoginForm = () => {
 
       // Kiểm tra kết quả
       if (response && response.code === 1000) {
-        
         // Điều hướng dựa theo vai trò
         const userRole = response.result?.role;
         if (userRole === "ADMIN") {
@@ -78,9 +83,7 @@ const LoginForm = () => {
 
   return (
     <Card className="w-[400px]">
-      <CardHeader className="text-center text-2xl font-bold">
-        Log in
-      </CardHeader>
+      <CardHeader className="text-center text-2xl font-bold">Đăng nhập</CardHeader>
       <CardContent className="space-y-4">
         {(loginError || authError) && (
           <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
@@ -98,8 +101,8 @@ const LoginForm = () => {
               name="username"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="uppercase text-xs font-bold text-zinc-500 dark:text-white">
-                    Username
+                  <FormLabel className="text-s font-bold text-zinc-500 dark:text-white">
+                    Tên đăng nhập
                   </FormLabel>
                   <FormControl>
                     <Input
@@ -119,8 +122,8 @@ const LoginForm = () => {
               name="password"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="uppercase text-xs font-bold text-zinc-500 dark:text-white">
-                    Password
+                  <FormLabel className="text-s font-bold text-zinc-500 dark:text-white">
+                    Mật khẩu
                   </FormLabel>
                   <FormControl>
                     <div className="relative">
@@ -155,6 +158,17 @@ const LoginForm = () => {
           </form>
         </Form>
       </CardContent>
+
+      {/* Thay thế bằng Link đến trang quên mật khẩu */}
+      <CardFooter>
+        <Button
+          variant="link"
+          className="w-full text-sm text-blue-600 hover:text-blue-800"
+          asChild
+        >
+          <Link href="/forgot-password">Quên mật khẩu?</Link>
+        </Button>
+      </CardFooter>
     </Card>
   );
 };
