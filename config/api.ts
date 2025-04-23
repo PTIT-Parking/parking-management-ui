@@ -8,7 +8,10 @@ export const API_ENDPOINTS = {
     LOGIN: '/auth/login',
     LOGOUT:'/auth/logout',
     MY_INFO: '/auth/my-info',
-    CHANGE_PASSWORD: "/auth/change-password"
+    CHANGE_PASSWORD: "/auth/change-password",
+    FORGOT_PASSWORD: "/auth/forgot-password",
+    RESET_PASSWORD: "/auth/reset-password",
+    VALIDATE_RESET_TOKEN: "/auth/validate-reset-token"
   },
   
   // Parking
@@ -18,7 +21,7 @@ export const API_ENDPOINTS = {
     EXIT: '/parking/exit',
     RECORDS: '/parking/records',
     RECORD_HISTORY: '/parking/record-history',
-    TODAY: '/parking/today',
+    TODAY: '/parking/today'
   },
 
   // Monthly cards
@@ -26,7 +29,7 @@ export const API_ENDPOINTS = {
     REGISTER: '/monthly-cards',
     ACTIVE: '/monthly-cards/active',
     EXPIRE: '/monthly-cards/expire',
-    DETAIL: (id: string) => `/monthly-cards/${id}`,
+    DETAIL: (id: string) => `/monthly-cards/${id}`
   },
 
   // Missing reports
@@ -36,25 +39,25 @@ export const API_ENDPOINTS = {
   PAYMENTS: {
     ALL: '/payments',
     AT_DATE: '/payments/at-date',
-    BY_ID: (id: string) => `/payments/${id}`,
+    BY_ID: (id: string) => `/payments/${id}`
   },
 
   // Prices
   PRICES: {
     ALL: '/prices',
-    BY_ID: (id: string) => `/prices/${id}`,
+    BY_ID: (id: string) => `/prices/${id}`
   },
 
   // Statistics
   STATISTICS: {
     REVENUE: '/statistic/revenue',
-    TRAFFIC: '/statistic/traffic',
+    TRAFFIC: '/statistic/traffic'
   },
 
   // Admin
   ADMIN: {
     STAFFS: '/admin/staffs',
-    STAFF_DETAIL: (id: string) => `/admin/staffs/${id}`,
+    STAFF_DETAIL: (id: string) => `/admin/staffs/${id}`
   },
 };
 
