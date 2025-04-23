@@ -11,7 +11,6 @@ import { vi } from "date-fns/locale";
 import {
   Loader2,
   Search,
-  Car,
   User,
   Calendar,
   Palette,
@@ -20,6 +19,7 @@ import {
   FileText,
   X,
   AlertTriangle,
+  Clock,
 } from "lucide-react";
 import { toast } from "sonner";
 import {
@@ -56,6 +56,7 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useFetchWithAuth } from "@/hooks/use-fetch-with-auth";
 import { API_ENDPOINTS, buildApiUrl } from "@/config/api";
 
@@ -302,19 +303,19 @@ export default function MissingReportsPage() {
     <div className="w-full px-4 py-6">
       {/* Header */}
       <div className="mb-8">
-        <h1 className="text-3xl font-bold mb-2">Lịch sử báo cáo mất thẻ gửi xe</h1>
+        <h1 className="text-3xl font-bold mb-2">
+          Lịch sử báo cáo mất thẻ gửi xe
+        </h1>
         <p className="text-gray-500">
           Danh sách các báo cáo mất thẻ xe đã được ghi nhận trong hệ thống
         </p>
       </div>
-
       {/* Hiển thị lỗi nếu có */}
       {error && (
         <div className="mt-4 p-4 rounded-lg bg-red-50 border border-red-200 mb-8">
           <p className="text-red-600 font-medium">{error}</p>
         </div>
       )}
-
       {/* Thống kê tổng quát */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
         <Card>
@@ -387,7 +388,6 @@ export default function MissingReportsPage() {
           </CardContent>
         </Card>
       </div>
-
       {/* Bảng danh sách báo cáo mất xe */}
       <Card className="shadow-sm">
         <CardHeader className="pb-4 border-b">
@@ -646,63 +646,84 @@ export default function MissingReportsPage() {
         </CardContent>
       </Card>
 
-      {/* Dialog xem chi tiết báo cáo */}
+      {/* Dialog xem chi tiết bản báo cáo */}
       <Dialog open={detailDialogOpen} onOpenChange={setDetailDialogOpen}>
-        <DialogContent className="sm:max-w-[600px]">
+        <DialogContent className="max-w-3xl">
           <DialogHeader>
             <DialogTitle>Chi tiết báo cáo mất thẻ xe</DialogTitle>
             <DialogDescription>
-              Thông tin chi tiết về báo cáo mất xe
+              Thông tin đầy đủ về báo cáo mất thẻ xe
             </DialogDescription>
           </DialogHeader>
 
           {selectedReport && (
-            <div className="space-y-4">
-              <div className="grid grid-cols-1 gap-4">
-                {/* Thông tin người báo mất */}
-                <div className="bg-slate-50 p-3 rounded-md">
-                  <h3 className="font-semibold text-slate-700 mb-2 flex items-center">
-                    <User className="h-4 w-4 mr-2 text-slate-600" />
-                    Thông tin người báo mất
-                  </h3>
-                  <div className="grid grid-cols-3 gap-2 text-sm">
-                    <div className="text-slate-500">Họ tên:</div>
-                    <div className="font-medium col-span-2">
-                      {selectedReport.name}
+            <Tabs defaultValue="reporter" className="w-full mt-2">
+              <TabsList className="grid grid-cols-4 mb-4 w-[100%]">
+                <TabsTrigger value="reporter">Chủ xe</TabsTrigger>
+                <TabsTrigger value="vehicle">Phương tiện</TabsTrigger>
+                <TabsTrigger value="time">Thời gian</TabsTrigger>
+                <TabsTrigger value="payment">Thanh toán</TabsTrigger>
+              </TabsList>
+              <div className="h-[230px] overflow-y-auto">
+                {/* Tab thông tin người báo mất */}
+                <TabsContent
+                  value="reporter"
+                  className="space-y-4 m-0 data-[state=inactive]:hidden"
+                >
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="space-y-1">
+                      <p className="text-sm font-medium text-gray-500">
+                        Họ tên
+                      </p>
+                      <div className="flex items-center">
+                        <User
+                          className={`h-4 w-4 mr-1.5 ${
+                            selectedReport.gender === "MALE"
+                              ? "text-blue-600"
+                              : "text-pink-600"
+                          }`}
+                        />
+                        <p>{selectedReport.name}</p>
+                      </div>
                     </div>
-
-                    <div className="text-slate-500">Giới tính:</div>
-                    <div className="font-medium col-span-2">
-                      {selectedReport.gender === "MALE" ? "Nam" : "Nữ"}
+                    <div className="space-y-1">
+                      <p className="text-sm font-medium text-gray-500">
+                        Giới tính
+                      </p>
+                      <p>{selectedReport.gender === "MALE" ? "Nam" : "Nữ"}</p>
                     </div>
-
-                    <div className="text-slate-500">CMND/CCCD:</div>
-                    <div className="font-medium col-span-2">
-                      {selectedReport.identification}
+                    <div className="space-y-1">
+                      <p className="text-sm font-medium text-gray-500">
+                        CMND/CCCD
+                      </p>
+                      <p>{selectedReport.identification}</p>
                     </div>
-
-                    <div className="text-slate-500">Điện thoại:</div>
-                    <div className="font-medium col-span-2">
-                      {selectedReport.phoneNumber}
+                    <div className="space-y-1">
+                      <p className="text-sm font-medium text-gray-500">
+                        Số điện thoại
+                      </p>
+                      <p>{selectedReport.phoneNumber}</p>
                     </div>
-
-                    <div className="text-slate-500">Địa chỉ:</div>
-                    <div className="font-medium col-span-2">
-                      {selectedReport.address}
+                    <div className="space-y-1 col-span-2">
+                      <p className="text-sm font-medium text-gray-500">
+                        Địa chỉ
+                      </p>
+                      <p>{selectedReport.address}</p>
                     </div>
                   </div>
-                </div>
+                </TabsContent>
 
-                {/* Thông tin xe */}
-                <div className="bg-slate-50 p-3 rounded-md">
-                  <h3 className="font-semibold text-slate-700 mb-2 flex items-center">
-                    <Car className="h-4 w-4 mr-2 text-slate-600" />
-                    Thông tin xe
-                  </h3>
-                  <div className="grid grid-cols-3 gap-2 text-sm">
-                    <div className="text-slate-500">Loại xe:</div>
-                    <div className="font-medium col-span-2">
-                      <div className="flex items-center gap-2">
+                {/* Tab thông tin xe */}
+                <TabsContent
+                  value="vehicle"
+                  className="space-y-4 m-0 data-[state=inactive]:hidden"
+                >
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="space-y-1">
+                      <p className="text-sm font-medium text-gray-500">
+                        Loại xe
+                      </p>
+                      <div className="flex items-center gap-1.5">
                         <span
                           className={`w-2 h-2 rounded-full inline-block ${
                             selectedReport.vehicleType.name === "Bicycle"
@@ -714,97 +735,150 @@ export default function MissingReportsPage() {
                               : "bg-purple-500"
                           }`}
                         ></span>
-                        {selectedReport.vehicleType.name}
+                        <p>{selectedReport.vehicleType.name}</p>
                       </div>
                     </div>
-
-                    <div className="text-slate-500">Biển số:</div>
-                    <div className="font-medium col-span-2">
-                      {selectedReport.licensePlate || "Không có"}
+                    <div className="space-y-1">
+                      <p className="text-sm font-medium text-gray-500">
+                        Biển số xe
+                      </p>
+                      <p>{selectedReport.licensePlate || "Không có"}</p>
                     </div>
-
-                    <div className="text-slate-500">Identifier:</div>
-                    <div className="font-medium col-span-2">
-                      {selectedReport.identifier || "Không có"}
+                    <div className="space-y-1">
+                      <p className="text-sm font-medium text-gray-500">
+                        Identifier
+                      </p>
+                      <p>{selectedReport.identifier || "Không có"}</p>
                     </div>
-
-                    <div className="text-slate-500">Thương hiệu:</div>
-                    <div className="font-medium col-span-2">
-                      {selectedReport.brand}
+                    <div className="space-y-1">
+                      <p className="text-sm font-medium text-gray-500">
+                        Hãng xe
+                      </p>
+                      <p>{selectedReport.brand}</p>
                     </div>
-
-                    <div className="text-slate-500">Màu sắc:</div>
-                    <div className="font-medium col-span-2">
-                      {selectedReport.color}
+                    <div className="space-y-1">
+                      <p className="text-sm font-medium text-gray-500">
+                        Màu xe
+                      </p>
+                      <p>{selectedReport.color}</p>
                     </div>
-
-                    <div className="text-slate-500">Mã thẻ:</div>
-                    <div className="font-medium col-span-2">
-                      {selectedReport.record.card.cardId}
+                    <div className="space-y-1">
+                      <p className="text-sm font-medium text-gray-500">
+                        Mã thẻ
+                      </p>
+                      <p>{selectedReport.record.card.cardId}</p>
                     </div>
-
-                    <div className="text-slate-500">Loại vé:</div>
-                    <div className="font-medium col-span-2">
-                      {selectedReport.record.type === "DAILY"
-                        ? "Vé ngày"
-                        : "Vé tháng"}
-                    </div>
-                  </div>
-                </div>
-
-                {/* Thông tin thời gian */}
-                <div className="bg-slate-50 p-3 rounded-md">
-                  <h3 className="font-semibold text-slate-700 mb-2 flex items-center">
-                    <Calendar className="h-4 w-4 mr-2 text-slate-600" />
-                    Thông tin thời gian
-                  </h3>
-                  <div className="grid grid-cols-3 gap-2 text-sm">
-                    <div className="text-slate-500">Thời gian gửi xe:</div>
-                    <div className="font-medium col-span-2">
-                      {formatDateTime(selectedReport.record.entryTime)}
-                    </div>
-
-                    <div className="text-slate-500">Thời gian báo mất:</div>
-                    <div className="font-medium col-span-2">
-                      {formatDateTime(selectedReport.createAt)}
-                    </div>
-
-                    <div className="text-slate-500">Thời gian gửi:</div>
-                    <div className="font-medium col-span-2">
-                      {calculateParkingDuration(
-                        selectedReport.record.entryTime,
-                        selectedReport.record.exitTime
-                      )}
+                    <div className="space-y-1">
+                      <p className="text-sm font-medium text-gray-500">
+                        Loại vé
+                      </p>
+                      <p>
+                        {selectedReport.record.type === "DAILY"
+                          ? "Vé ngày"
+                          : "Vé tháng"}
+                      </p>
                     </div>
                   </div>
-                </div>
+                </TabsContent>
 
-                {/* Thông tin thanh toán */}
-                <div className="bg-slate-50 p-3 rounded-md">
-                  <h3 className="font-semibold text-slate-700 mb-2 flex items-center">
-                    <CreditCard className="h-4 w-4 mr-2 text-slate-600" />
-                    Thông tin thanh toán
-                  </h3>
-                  <div className="grid grid-cols-3 gap-2 text-sm">
-                    <div className="text-slate-500">Phí bồi thường:</div>
-                    <div className="font-medium col-span-2">
-                      {selectedReport.payment.amount.toLocaleString("vi-VN")}{" "}
-                      VNĐ
+                {/* Tab thông tin thời gian */}
+                <TabsContent
+                  value="time"
+                  className="space-y-4 m-0 data-[state=inactive]:hidden"
+                >
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="space-y-1">
+                      <p className="text-sm font-medium text-gray-500">
+                        Thời gian gửi xe
+                      </p>
+                      <div className="flex items-center">
+                        <Calendar className="h-4 w-4 mr-1.5 text-gray-500" />
+                        <p>{formatDateTime(selectedReport.record.entryTime)}</p>
+                      </div>
                     </div>
-
-                    <div className="text-slate-500">Thời gian thanh toán:</div>
-                    <div className="font-medium col-span-2">
-                      {formatDateTime(selectedReport.payment.createAt)}
+                    <div className="space-y-1">
+                      <p className="text-sm font-medium text-gray-500">
+                        Thời gian báo mất
+                      </p>
+                      <div className="flex items-center">
+                        <Calendar className="h-4 w-4 mr-1.5 text-gray-500" />
+                        <p>{formatDateTime(selectedReport.createAt)}</p>
+                      </div>
                     </div>
-
-                    <div className="text-slate-500">Nhân viên xử lý:</div>
-                    <div className="font-medium col-span-2">
-                      {selectedReport.createBy.username}
+                    <div className="space-y-1">
+                      <p className="text-sm font-medium text-gray-500">
+                        Thời gian gửi
+                      </p>
+                      <div className="flex items-center">
+                        <Clock className="h-4 w-4 mr-1.5 text-gray-500" />
+                        <p>
+                          {calculateParkingDuration(
+                            selectedReport.record.entryTime,
+                            selectedReport.record.exitTime
+                          )}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="space-y-1">
+                      <p className="text-sm font-medium text-gray-500">
+                        Nhân viên gửi xe
+                      </p>
+                      <div className="flex items-center">
+                        <User className="h-4 w-4 mr-1.5 text-gray-500" />
+                        <p>{selectedReport.record.staffIn.username}</p>
+                      </div>
                     </div>
                   </div>
-                </div>
+                </TabsContent>
+
+                {/* Tab thông tin thanh toán */}
+                <TabsContent
+                  value="payment"
+                  className="space-y-4 m-0 data-[state=inactive]:hidden"
+                >
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="space-y-1">
+                      <p className="text-sm font-medium text-gray-500">
+                        Phí bồi thường
+                      </p>
+                      <div className="flex items-center">
+                        <CreditCard className="h-4 w-4 mr-1.5 text-gray-500" />
+                        <p className="font-semibold text-green-600">
+                          {selectedReport.payment.amount.toLocaleString(
+                            "vi-VN"
+                          )}{" "}
+                          VNĐ
+                        </p>
+                      </div>
+                    </div>
+                    <div className="space-y-1">
+                      <p className="text-sm font-medium text-gray-500">
+                        Phương thức thanh toán
+                      </p>
+                      <p>{selectedReport.payment.paymentType}</p>
+                    </div>
+                    <div className="space-y-1">
+                      <p className="text-sm font-medium text-gray-500">
+                        Thời gian thanh toán
+                      </p>
+                      <div className="flex items-center">
+                        <Clock className="h-4 w-4 mr-1.5 text-gray-500" />
+                        <p>{formatDateTime(selectedReport.payment.createAt)}</p>
+                      </div>
+                    </div>
+                    <div className="space-y-1">
+                      <p className="text-sm font-medium text-gray-500">
+                        Nhân viên xử lý
+                      </p>
+                      <div className="flex items-center">
+                        <User className="h-4 w-4 mr-1.5 text-gray-500" />
+                        <p>{selectedReport.createBy.username}</p>
+                      </div>
+                    </div>
+                  </div>
+                </TabsContent>
               </div>
-            </div>
+            </Tabs>
           )}
 
           <DialogFooter>
