@@ -6,12 +6,7 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { format } from "date-fns";
-import {
-  Calendar as CalendarIcon,
-  Loader2,
-  Save,
-  ArrowLeft,
-} from "lucide-react";
+import { Loader2, Save, ArrowLeft } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -39,11 +34,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import {
   AlertDialog,
   AlertDialogAction,
   AlertDialogCancel,
@@ -53,10 +43,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { Calendar } from "@/components/ui/calendar";
 import { toast } from "sonner";
-import { cn } from "@/lib/utils";
-import { vi } from "date-fns/locale";
 
 // Định nghĩa kiểu dữ liệu
 interface ApiResponse {
@@ -170,17 +157,14 @@ export default function AddStaffPage() {
         isActive: true, // Mặc định là hoạt động
       };
 
-      const response = await fetch(
-        `http://localhost:8080/api/admin/staffs`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify(requestBody),
-        }
-      );
+      const response = await fetch(`http://localhost:8080/api/admin/staffs`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(requestBody),
+      });
 
       const data: ApiResponse = await response.json();
 
@@ -216,9 +200,7 @@ export default function AddStaffPage() {
     } catch (err) {
       console.error("Error adding staff:", err);
       toast.error(
-        err instanceof Error
-          ? err.message
-          : "Không thể thêm nhân viên mới"
+        err instanceof Error ? err.message : "Không thể thêm nhân viên mới"
       );
     } finally {
       setSubmitting(false);
@@ -285,10 +267,10 @@ export default function AddStaffPage() {
                       <FormItem>
                         <FormLabel>Mật khẩu</FormLabel>
                         <FormControl>
-                          <Input 
+                          <Input
                             type="password"
-                            placeholder="Nhập mật khẩu" 
-                            {...field} 
+                            placeholder="Nhập mật khẩu"
+                            {...field}
                           />
                         </FormControl>
                         <FormMessage />
@@ -328,121 +310,26 @@ export default function AddStaffPage() {
                     control={form.control}
                     name="dob"
                     render={({ field }) => (
-                      <FormItem className="flex flex-col">
+                      <FormItem>
                         <FormLabel>Ngày sinh</FormLabel>
-                        <Popover>
-                          <PopoverTrigger asChild>
-                            <FormControl>
-                              <Button
-                                variant={"outline"}
-                                className={cn(
-                                  "w-full pl-3 text-left font-normal",
-                                  !field.value && "text-muted-foreground"
-                                )}
-                              >
-                                {field.value ? (
-                                  format(field.value, "dd/MM/yyyy", {
-                                    locale: vi,
-                                  })
-                                ) : (
-                                  <span>Chọn ngày sinh</span>
-                                )}
-                                <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                              </Button>
-                            </FormControl>
-                          </PopoverTrigger>
-                          <PopoverContent className="w-auto p-0" align="start">
-                            <div className="p-3 border-b border-border flex justify-between items-center">
-                              <div className="flex gap-2 items-center">
-                                <div className="flex items-center">
-                                  <span className="text-sm mr-1">Tháng:</span>
-                                  <input
-                                    type="number"
-                                    min="1"
-                                    max="12"
-                                    value={
-                                      field.value
-                                        ? parseInt(format(field.value, "MM"))
-                                        : new Date().getMonth() + 1
-                                    }
-                                    onChange={(e) => {
-                                      const value = e.target.value;
-                                      if (value && !isNaN(parseInt(value))) {
-                                        const month = Math.min(
-                                          Math.max(parseInt(value), 1),
-                                          12
-                                        );
-                                        // Tạo một ngày mới dựa trên ngày hiện tại hoặc ngày đã chọn
-                                        const newDate = field.value
-                                          ? new Date(field.value)
-                                          : new Date();
-                                        // Cập nhật tháng (lưu ý phải trừ 1 vì setMonth bắt đầu từ 0)
-                                        newDate.setMonth(month - 1);
-                                        // Cập nhật giá trị cho field và calendar
-                                        field.onChange(new Date(newDate));
-                                      }
-                                    }}
-                                    className="w-16 px-2 py-1 rounded border text-sm"
-                                  />
-                                </div>
-                                <div className="flex items-center">
-                                  <span className="text-sm mr-1">Năm:</span>
-                                  <input
-                                    type="number"
-                                    min="1900"
-                                    max={new Date().getFullYear()}
-                                    value={
-                                      field.value
-                                        ? format(field.value, "yyyy")
-                                        : new Date().getFullYear()
-                                    }
-                                    onChange={(e) => {
-                                      const value = e.target.value;
-                                      if (value && !isNaN(parseInt(value))) {
-                                        const year = Math.min(
-                                          Math.max(parseInt(value), 1900),
-                                          new Date().getFullYear()
-                                        );
-                                        // Tạo một ngày mới dựa trên ngày hiện tại hoặc ngày đã chọn
-                                        const newDate = field.value
-                                          ? new Date(field.value)
-                                          : new Date();
-                                        // Cập nhật năm
-                                        newDate.setFullYear(year);
-                                        // Cập nhật giá trị cho field và calendar
-                                        field.onChange(new Date(newDate));
-                                      }
-                                    }}
-                                    className="w-20 px-2 py-1 rounded border text-sm"
-                                  />
-                                </div>
-                              </div>
-                            </div>
-                            <Calendar
-                              mode="single"
-                              selected={field.value}
-                              onSelect={field.onChange}
-                              month={field.value || undefined}
-                              defaultMonth={field.value || undefined}
-                              disabled={(date) =>
-                                date > new Date() ||
-                                date < new Date("1900-01-01")
-                              }
-                              initialFocus
-                              locale={vi}
-                              captionLayout="buttons"
-                              onMonthChange={(month) => {
-                                // Khi calendar thay đổi tháng, cập nhật lại field value để giữ nguyên ngày
-                                const newDate = field.value
-                                  ? new Date(field.value)
-                                  : new Date();
-                                newDate.setMonth(month.getMonth());
-                                newDate.setFullYear(month.getFullYear());
-                                field.onChange(new Date(newDate));
-                              }}
-                            />
-                          </PopoverContent>
-                        </Popover>
+                        <FormControl>
+                          <Input
+                            type="date"
+                            {...field}
+                            value={
+                              field.value
+                                ? format(field.value, "yyyy-MM-dd")
+                                : ""
+                            }
+                            onChange={(e) => {
+                              const date = e.target.value
+                                ? new Date(e.target.value)
+                                : undefined;
+                              field.onChange(date);
+                            }}
+                            disabled={submitting}
+                          />
+                        </FormControl>
                         <FormMessage />
                       </FormItem>
                     )}
