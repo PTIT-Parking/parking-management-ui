@@ -67,7 +67,7 @@ export default function ForgotPasswordPage() {
       if (data.code === 1000) {
         setIsSuccess(true);
         form.reset();
-      } else if (data.code === 2004) {
+      } else if (data.code === 2004 || data.code === 2007) {
         setError("Tài khoản không tồn tại");
       } else if (data.code === 1010) {
         setError("Email không khớp với tài khoản");
