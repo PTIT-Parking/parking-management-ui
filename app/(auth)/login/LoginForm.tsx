@@ -120,7 +120,7 @@ const LoginForm = () => {
                     </FormLabel>
                     <FormControl>
                       <Input
-                        className="bg-gray-800 border border-gray-700 focus:border-white focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-0 placeholder:text-gray-500 text-white py-2.5 px-4 rounded-lg shadow-inner"
+                        className="bg-slate-100 dark:bg-slate-500 border-0 focus-visible:ring-0 text-black dark:text-white focus-visible:ring-offset-0 pr-10"
                         placeholder="Nhập tên đăng nhập của bạn"
                         disabled={isLoading}
                         {...field}
