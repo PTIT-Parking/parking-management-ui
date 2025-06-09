@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Navbar from "@/components/Navbar";
+import Footer from "@/components/footer";
 import StaffSidebar from "@/components/StaffSidebar";
 import { Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -79,6 +80,9 @@ const StaffLayout = ({ children }: { children: React.ReactNode }) => {
         <div className="flex-1 overflow-y-auto">
           <div className="p-5">{children}</div>
         </div>
+      </div>
+      <div>
+        <Footer />
       </div>
     </div>
   );

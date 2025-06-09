@@ -32,7 +32,7 @@ const StaffSidebar = () => {
   };
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col h-full bg-yellow-100">
       <div className="px-4 py-4 border-b shrink-0">
         <h2 className="text-xl font-bold tracking-tight">STAFF PAGE</h2>
       </div>
@@ -42,9 +42,9 @@ const StaffSidebar = () => {
           {/* Dashboard - Trang chủ */}
           <div
             className={cn(
-              "flex w-full items-center py-2 text-sm transition-all hover:bg-slate-100 rounded-md cursor-pointer",
+              "flex w-full items-center py-2 text-sm transition-all hover:bg-yellow-200 rounded-md cursor-pointer",
               isActive("/staff/dashboard") &&
-                "bg-slate-100 text-slate-900 font-medium"
+                "bg-slate-100 bg-yellow-300 font-medium"
             )}
             onClick={() => handleNavigation("/staff/dashboard")}
           >
@@ -56,8 +56,8 @@ const StaffSidebar = () => {
             <AccordionItem value="parking" className="border-0">
               <AccordionTrigger
                 className={cn(
-                  "py-2 text-sm hover:bg-slate-100 hover:no-underline rounded-md",
-                  isActive("/staff/parking") && "bg-slate-100 font-medium"
+                  "py-2 text-sm hover:bg-yellow-200 hover:no-underline rounded-md",
+                  isActive("/staff/parking") && "bg-yellow-300 font-medium"
                 )}
               >
                 <span className="flex w-full items-center">
@@ -68,9 +68,9 @@ const StaffSidebar = () => {
               <AccordionContent className="pl-6 py-0">
                 <div
                   className={cn(
-                    "flex w-full items-center py-2 text-sm transition-all hover:bg-slate-100 rounded-md cursor-pointer",
+                    "flex w-full items-center py-2 text-sm transition-all hover:bg-yellow-200 rounded-md cursor-pointer",
                     isActive("/staff/parking/entry") &&
-                      "bg-slate-100 text-slate-900 font-medium"
+                      "bg-yellow-300 text-slate-900 font-medium"
                   )}
                   onClick={() => handleNavigation("/staff/parking/entry")}
                 >
@@ -78,9 +78,9 @@ const StaffSidebar = () => {
                 </div>
                 <div
                   className={cn(
-                    "flex w-full items-center py-2 text-sm transition-all hover:bg-slate-100 rounded-md cursor-pointer",
+                    "flex w-full items-center py-2 text-sm transition-all hover:bg-yellow-200 rounded-md cursor-pointer",
                     isActive("/staff/parking/exit") &&
-                      "bg-slate-100 text-slate-900 font-medium"
+                      "bg-yellow-300 text-slate-900 font-medium"
                   )}
                   onClick={() => handleNavigation("/staff/parking/exit")}
                 >
@@ -88,9 +88,9 @@ const StaffSidebar = () => {
                 </div>
                 <div
                   className={cn(
-                    "flex w-full items-center py-2 text-sm transition-all hover:bg-slate-100 rounded-md cursor-pointer",
+                    "flex w-full items-center py-2 text-sm transition-all hover:bg-yellow-200 rounded-md cursor-pointer",
                     isActive("/staff/parking/records") &&
-                      "bg-slate-100 text-slate-900 font-medium"
+                      "bg-yellow-300 text-slate-900 font-medium"
                   )}
                   onClick={() => handleNavigation("/staff/parking/records")}
                 >
@@ -102,8 +102,8 @@ const StaffSidebar = () => {
             <AccordionItem value="monthly" className="border-0">
               <AccordionTrigger
                 className={cn(
-                  "py-2 text-sm hover:bg-slate-100 hover:no-underline rounded-md",
-                  isActive("/staff/monthly") && "bg-slate-100 font-medium"
+                  "py-2 text-sm hover:bg-yellow-200 hover:no-underline rounded-md",
+                  isActive("/staff/monthly") && "bg-yellow-300 font-medium"
                 )}
               >
                 <span className="flex w-full items-center">
@@ -114,9 +114,9 @@ const StaffSidebar = () => {
               <AccordionContent className="pl-6 py-0">
                 <div
                   className={cn(
-                    "flex w-full items-center py-2 text-sm transition-all hover:bg-slate-100 rounded-md cursor-pointer",
+                    "flex w-full items-center py-2 text-sm transition-all hover:bg-yellow-200 rounded-md cursor-pointer",
                     isActive("/staff/monthly/register") &&
-                      "bg-slate-100 text-slate-900 font-medium"
+                      "bg-yellow-300 text-slate-900 font-medium"
                   )}
                   onClick={() => handleNavigation("/staff/monthly/register")}
                 >
@@ -124,7 +124,7 @@ const StaffSidebar = () => {
                 </div>
                 <div
                   className={cn(
-                    "flex w-full items-center py-2 text-sm transition-all hover:bg-slate-100 rounded-md cursor-pointer",
+                    "flex w-full items-center py-2 text-sm transition-all hover:bg-yellow-200 rounded-md cursor-pointer",
                     isActive("/staff/monthly/list-registration") &&
                       "bg-slate-100 text-slate-900 font-medium"
                   )}
@@ -141,9 +141,9 @@ const StaffSidebar = () => {
           {/* Missing Vehicle Reports */}
           <div
             className={cn(
-              "flex w-full items-center py-2 text-sm transition-all hover:bg-slate-100 rounded-md cursor-pointer",
+              "flex w-full items-center py-2 text-sm transition-all hover:bg-yellow-200 rounded-md cursor-pointer",
               isActive("/staff/missing") &&
-                "bg-slate-100 text-slate-900 font-medium"
+                "bg-yellow-300 text-slate-900 font-medium"
             )}
             onClick={() => handleNavigation("/staff/missing")}
           >
@@ -151,11 +151,6 @@ const StaffSidebar = () => {
             Báo mất thẻ xe
           </div>
         </div>
-      </div>
-
-      {/* Thêm phần dưới cùng (nếu cần) */}
-      <div className="mt-auto border-t py-2 px-4 shrink-0">
-        <div className="text-xs text-slate-500">© 2025 Parking Management</div>
       </div>
     </div>
   );

@@ -98,9 +98,6 @@ export default function Dashboard({ title = "Dashboard", role = "staff" }: Reado
       <div className="mb-8 flex justify-between items-start">
         <div>
           <h1 className="text-3xl font-bold mb-2">{title}</h1>
-          <p className="text-gray-500">
-            Tổng quan tình hình bãi đỗ xe ngày {today}
-          </p>
         </div>
 
         <div className="flex items-center gap-2 bg-slate-100 rounded-lg px-4 py-2">
@@ -260,7 +257,7 @@ export default function Dashboard({ title = "Dashboard", role = "staff" }: Reado
 
       {/* Bảng hoạt động */}
       <Card className="shadow-sm hover:shadow-md transition-shadow duration-300">
-        <CardHeader className="flex flex-row items-start justify-between border-b pb-4">
+        <CardHeader className="flex flex-row items-start justify-between">
           <div>
             <CardTitle className="text-lg font-bold flex items-center gap-2">
               <Activity className="h-5 w-5" />
@@ -274,8 +271,8 @@ export default function Dashboard({ title = "Dashboard", role = "staff" }: Reado
         <CardContent className="p-0">
           <div className="overflow-x-auto">
             <Table>
-              <TableHeader>
-                <TableRow className="bg-slate-50 dark:bg-slate-800">
+              <TableHeader className="focus:bg-yellow-200">
+                <TableRow className="bg-slate-50 dark:bg-slate-800 focus:bg-yellow-200 focus:ring-0 active:bg-inherit hover:bg-inherit ">
                   <TableHead className="font-medium w-[5%] text-center py-3">
                     STT
                   </TableHead>
@@ -314,14 +311,7 @@ export default function Dashboard({ title = "Dashboard", role = "staff" }: Reado
                   </TableRow>
                 ) : (
                   currentData.map((record, index) => (
-                    <TableRow
-                      key={index}
-                      className={
-                        index % 2 === 0
-                          ? "bg-white"
-                          : "bg-slate-50/50 dark:bg-slate-900/50"
-                      }
-                    >
+                    <TableRow>
                       <TableCell className="text-center text-slate-500">
                         {(currentPage - 1) * 5 + index + 1}
                       </TableCell>

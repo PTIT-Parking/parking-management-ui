@@ -36,7 +36,7 @@ const AdminSidebar = ({ isMobile = false }: AdminSidebarProps) => {
   };
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col h-full bg-yellow-100">
       <div className="px-4 py-4 border-b shrink-0">
         <h2 className="text-xl font-bold tracking-tight">ADMIN PAGE</h2>
       </div>
@@ -46,9 +46,9 @@ const AdminSidebar = ({ isMobile = false }: AdminSidebarProps) => {
           {/* Dashboard - Trang chủ */}
           <div
             className={cn(
-              "flex w-full items-center py-2 text-sm transition-all hover:bg-slate-100 rounded-md cursor-pointer",
+              "flex w-full items-center py-2 text-sm transition-all hover:bg-yellow-200 rounded-md cursor-pointer",
               isActive("/admin/dashboard") &&
-                "bg-slate-100 text-slate-900 font-medium"
+                "bg-yellow-300 text-slate-900 font-medium"
             )}
             onClick={() => handleNavigation("/admin/dashboard")}
           >
@@ -60,8 +60,8 @@ const AdminSidebar = ({ isMobile = false }: AdminSidebarProps) => {
             <AccordionItem value="staff" className="border-0">
               <AccordionTrigger
                 className={cn(
-                  "py-2 text-sm hover:bg-slate-100 hover:no-underline rounded-md",
-                  isActive("/admin/staff") && "bg-slate-100 font-medium"
+                  "py-2 text-sm hover:bg-yellow-200 hover:no-underline rounded-md",
+                  isActive("/admin/staff") && "bg-yellow-300 font-medium"
                 )}
               >
                 <span className="flex w-full items-center">
@@ -72,9 +72,9 @@ const AdminSidebar = ({ isMobile = false }: AdminSidebarProps) => {
               <AccordionContent className="pl-6 py-0">
                 <div
                   className={cn(
-                    "flex w-full items-center py-2 text-sm transition-all hover:bg-slate-100 rounded-md cursor-pointer",
+                    "flex w-full items-center py-2 text-sm transition-all hover:bg-yellow-200 rounded-md cursor-pointer",
                     isActive("/admin/staff/staff-list") &&
-                      "bg-slate-100 text-slate-900 font-medium"
+                      "bg-yellow-300 text-slate-900 font-medium"
                   )}
                   onClick={() => handleNavigation("/admin/staff/staff-list")}
                 >
@@ -82,9 +82,9 @@ const AdminSidebar = ({ isMobile = false }: AdminSidebarProps) => {
                 </div>
                 <div
                   className={cn(
-                    "flex w-full items-center py-2 text-sm transition-all hover:bg-slate-100 rounded-md cursor-pointer",
+                    "flex w-full items-center py-2 text-sm transition-all hover:bg-yellow-200 rounded-md cursor-pointer",
                     isActive("/admin/staff/add-staff") &&
-                      "bg-slate-100 text-slate-900 font-medium"
+                      "bg-yellow-300 text-slate-900 font-medium"
                   )}
                   onClick={() => handleNavigation("/admin/staff/add-staff")}
                 >
@@ -96,8 +96,8 @@ const AdminSidebar = ({ isMobile = false }: AdminSidebarProps) => {
             <AccordionItem value="history" className="border-0">
               <AccordionTrigger
                 className={cn(
-                  "py-2 text-sm hover:bg-slate-100 hover:no-underline rounded-md",
-                  isActive("/admin/history") && "bg-slate-100 font-medium"
+                  "py-2 text-sm hover:bg-yellow-200 hover:no-underline rounded-md",
+                  isActive("/admin/history") && "bg-yellow-300 font-medium"
                 )}
               >
                 <span className="flex w-full items-center">
@@ -108,9 +108,9 @@ const AdminSidebar = ({ isMobile = false }: AdminSidebarProps) => {
               <AccordionContent className="pl-6 py-0">
                 <div
                   className={cn(
-                    "flex w-full items-center py-2 text-sm transition-all hover:bg-slate-100 rounded-md cursor-pointer",
+                    "flex w-full items-center py-2 text-sm transition-all hover:bg-yellow-200 rounded-md cursor-pointer",
                     isActive("/admin/history/parking-records") &&
-                      "bg-slate-100 text-slate-900 font-medium"
+                      "bg-yellow-300 text-slate-900 font-medium"
                   )}
                   onClick={() =>
                     handleNavigation("/admin/history/parking-records")
@@ -121,9 +121,9 @@ const AdminSidebar = ({ isMobile = false }: AdminSidebarProps) => {
 
                 <div
                   className={cn(
-                    "flex w-full items-center py-2 text-sm transition-all hover:bg-slate-100 rounded-md cursor-pointer",
+                    "flex w-full items-center py-2 text-sm transition-all hover:bg-yellow-200 rounded-md cursor-pointer",
                     isActive("/admin/history/monthly-cards") &&
-                      "bg-slate-100 text-slate-900 font-medium"
+                      "bg-yellow-300 text-slate-900 font-medium"
                   )}
                   onClick={() =>
                     handleNavigation("/admin/history/monthly-cards")
@@ -134,9 +134,9 @@ const AdminSidebar = ({ isMobile = false }: AdminSidebarProps) => {
 
                 <div
                   className={cn(
-                    "flex w-full items-center py-2 text-sm transition-all hover:bg-slate-100 rounded-md cursor-pointer",
+                    "flex w-full items-center py-2 text-sm transition-all hover:bg-yellow-200 rounded-md cursor-pointer",
                     isActive("/admin/history/missing-reports") &&
-                      "bg-slate-100 text-slate-900 font-medium"
+                      "bg-yellow-300 text-slate-900 font-medium"
                   )}
                   onClick={() =>
                     handleNavigation("/admin/history/missing-reports")
@@ -147,9 +147,9 @@ const AdminSidebar = ({ isMobile = false }: AdminSidebarProps) => {
 
                 <div
                   className={cn(
-                    "flex w-full items-center py-2 text-sm transition-all hover:bg-slate-100 rounded-md cursor-pointer",
+                    "flex w-full items-center py-2 text-sm transition-all hover:bg-yellow-200 rounded-md cursor-pointer",
                     isActive("/admin/history/payments") &&
-                      "bg-slate-100 text-slate-900 font-medium"
+                      "bg-yellow-300 text-slate-900 font-medium"
                   )}
                   onClick={() => handleNavigation("/admin/history/payments")}
                 >
@@ -160,9 +160,9 @@ const AdminSidebar = ({ isMobile = false }: AdminSidebarProps) => {
 
             <div
               className={cn(
-                "flex w-full items-center py-2 text-sm transition-all hover:bg-slate-100 rounded-md cursor-pointer",
+                "flex w-full items-center py-2 text-sm transition-all hover:bg-yellow-200 rounded-md cursor-pointer",
                 isActive("/admin/prices") &&
-                  "bg-slate-100 text-slate-900 font-medium"
+                  "bg-yellow-300 text-slate-900 font-medium"
               )}
               onClick={() => handleNavigation("/admin/prices")}
             >
@@ -173,8 +173,8 @@ const AdminSidebar = ({ isMobile = false }: AdminSidebarProps) => {
             <AccordionItem value="statistics" className="border-0">
               <AccordionTrigger
                 className={cn(
-                  "py-2 text-sm hover:bg-slate-100 hover:no-underline rounded-md",
-                  isActive("/admin/statistic") && "bg-slate-100 font-medium"
+                  "py-2 text-sm hover:bg-yellow-200 hover:no-underline rounded-md",
+                  isActive("/admin/statistic") && "bg-yellow-300 font-medium"
                 )}
               >
                 <span className="flex w-full items-center">
@@ -185,9 +185,9 @@ const AdminSidebar = ({ isMobile = false }: AdminSidebarProps) => {
               <AccordionContent className="pl-6 py-0">
                 <div
                   className={cn(
-                    "flex w-full items-center py-2 text-sm transition-all hover:bg-slate-100 rounded-md cursor-pointer",
+                    "flex w-full items-center py-2 text-sm transition-all hover:bg-yellow-200 rounded-md cursor-pointer",
                     isActive("/admin/statistic/revenue") &&
-                      "bg-slate-100 text-slate-900 font-medium"
+                      "bg-yellow-300 text-slate-900 font-medium"
                   )}
                   onClick={() => handleNavigation("/admin/statistic/revenue")}
                 >
@@ -195,9 +195,9 @@ const AdminSidebar = ({ isMobile = false }: AdminSidebarProps) => {
                 </div>
                 <div
                   className={cn(
-                    "flex w-full items-center py-2 text-sm transition-all hover:bg-slate-100 rounded-md cursor-pointer",
+                    "flex w-full items-center py-2 text-sm transition-all hover:bg-yellow-200 rounded-md cursor-pointer",
                     isActive("/admin/statistic/traffic") &&
-                      "bg-slate-100 text-slate-900 font-medium"
+                      "bg-yellow-300 text-slate-900 font-medium"
                   )}
                   onClick={() => handleNavigation("/admin/statistic/traffic")}
                 >
@@ -207,11 +207,6 @@ const AdminSidebar = ({ isMobile = false }: AdminSidebarProps) => {
             </AccordionItem>
           </Accordion>
         </div>
-      </div>
-
-      {/* Thêm phần dưới cùng (nếu cần) */}
-      <div className="mt-auto border-t py-2 px-4 shrink-0">
-        <div className="text-xs text-slate-500">© 2025 Parking Management</div>
       </div>
     </div>
   );

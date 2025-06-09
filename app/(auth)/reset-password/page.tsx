@@ -2,7 +2,7 @@
 // KHÔNG CÓ "use client"; ở đây nữa
 
 import { Suspense } from 'react';
-import ResetPasswordForm from './ret'; // Import Client Component vừa tạo
+import ResetPasswordForm from './ResetForm'; // Import Client Component vừa tạo
 import { Loader2 } from "lucide-react"; // Để sử dụng cho fallback của Suspense
 
 export default function ResetPasswordPage() {

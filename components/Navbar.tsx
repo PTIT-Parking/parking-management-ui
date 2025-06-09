@@ -46,8 +46,8 @@ const Navbar = ({ children }: NavbarProps) => {
   };
 
   return (
-    <div className="bg-primary text-white py-2 px-5 flex justify-between items-center z-20">
-      <div className="flex items-center">
+    <div className="bg-gray-900 text-white py-2 px-5 flex justify-between items-center z-20">
+      <div className="flex items-center bg-gray-900">
         {children}
         <Link href={dashboardUrl} className="flex items-center">
           <Image
@@ -60,7 +60,7 @@ const Navbar = ({ children }: NavbarProps) => {
         </Link>
       </div>
 
-      <div className="flex items-center">
+      <div className="flex items-center ">
         <DropdownMenu>
           <DropdownMenuTrigger className="flex items-center focus:outline-none hover:bg-primary-600/20 py-1 px-2 rounded-md transition-colors hover:text-gray-400">
             <div className="h-8 w-8 rounded-full bg-primary-600/30 flex items-center justify-center">
@@ -68,7 +68,7 @@ const Navbar = ({ children }: NavbarProps) => {
             </div>
             <span className="max-w-[150px] truncate ml-2">{displayName}</span>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-56">
+          <DropdownMenuContent align="end" className="w-56 bg-yellow-100  ">
             <DropdownMenuLabel>
               <div className="flex flex-col">
                 <span className="font-medium">{user?.name || displayName}</span>
@@ -80,15 +80,23 @@ const Navbar = ({ children }: NavbarProps) => {
                 )}
               </div>
             </DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem>
-              <Link href={profileUrl} className="w-full flex items-center">
-                <UserCircle className="mr-2 h-4 w-4" />
-                <span>Hồ sơ cá nhân</span>
-              </Link>
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem>
+            
+           <DropdownMenuSeparator />
+
+            {user?.role !== "ADMIN" && (
+              <> {/* Sử dụng Fragment để nhóm các mục mà không thêm node DOM thừa */}
+                <DropdownMenuItem className="focus:bg-yellow-200 dark:hover:bg-yellow-700">
+                  <Link href={profileUrl} className="w-full flex items-center ">
+                    <UserCircle className="mr-2 h-4 w-4" />
+                    <span>Hồ sơ cá nhân</span>
+                  </Link>
+                </DropdownMenuItem>
+                {/* Đường phân cách này chỉ hiển thị nếu "Hồ sơ cá nhân" hiển thị, ví dụ trước các mục cuối cùng (ví dụ: đăng xuất) */}
+                <DropdownMenuSeparator />
+              </>
+            )}
+            
+            <DropdownMenuItem className="focus:bg-yellow-200 dark:hover:bg-yellow-700">
               <Link
                 href={
                   user?.role === "ADMIN"
@@ -103,7 +111,7 @@ const Navbar = ({ children }: NavbarProps) => {
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem
-              className="text-red-500 cursor-pointer focus:text-red-500 focus:bg-red-50"
+              className="text-red-500 cursor-pointer focus:text-red-500 focus:bg-yellow-200"
               onClick={handleLogout}
             >
               <LogOut className="mr-2 h-4 w-4" />

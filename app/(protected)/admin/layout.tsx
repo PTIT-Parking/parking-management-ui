@@ -1,5 +1,6 @@
 "use client";
 
+import Footer from "@/components/footer";
 import { useState, useEffect } from "react";
 import Navbar from "@/components/Navbar";
 import AdminSidebar from "@/components/AdminSidebar";
@@ -79,6 +80,9 @@ const AdminLayout = ({ children }: { children: React.ReactNode }) => {
         <div className="flex-1 overflow-y-auto">
           <div className="p-5">{children}</div>
         </div>
+      </div>
+      <div>
+        <Footer />
       </div>
     </div>
   );
