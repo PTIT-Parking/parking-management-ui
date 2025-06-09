@@ -6,6 +6,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ArrowLeft, Loader2 } from "lucide-react";
 import Link from "next/link";
+import { cn } from "@/lib/utils"; 
 import {
   Form,
   FormControl,
@@ -83,14 +84,12 @@ export default function ForgotPasswordPage() {
   };
 
   return (
-    <Card className="w-[400px]">
+    <div className="w-full h-screen flex items-center justify-center p-4 bg-gray-50">
+    <Card className="w-full max-w-lg p-6 sm:p-8 rounded-2xl shadow-2xl bg-gray-900 text-white border border-gray-800">
       <CardHeader>
         <CardTitle className="text-center text-2xl font-bold">
           Quên mật khẩu
         </CardTitle>
-        <CardDescription className="text-center">
-          Nhập tên đăng nhập và email để khôi phục mật khẩu
-        </CardDescription>
       </CardHeader>
       <CardContent>
         {error && (
@@ -172,7 +171,14 @@ export default function ForgotPasswordPage() {
                 )}
               />
 
-              <Button type="submit" className="w-full" disabled={isLoading}>
+              <Button 
+                type="submit" 
+                className={cn(
+                                  "w-full py-2.5 text-lg font-bold rounded-lg transition-all duration-300 ease-in-out transform hover:scale-105",
+                                  "bg-yellow-500 hover:bg-yellow-600 text-gray-950 shadow-lg",
+                                  isLoading && "opacity-70 cursor-not-allowed"
+                                )}
+                disabled={isLoading}>
                 {isLoading ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -188,16 +194,15 @@ export default function ForgotPasswordPage() {
       </CardContent>
       <CardFooter>
         <Button
-          variant="outline"
-          className="w-full flex items-center justify-center"
-          asChild
-        >
-          <Link href="/login">
-            <ArrowLeft className="mr-2 h-4 w-4" />
-            Quay lại trang đăng nhập
-          </Link>
-        </Button>
+              variant="link"
+              className="text-sm text-gray-400 hover:text-white hover:underline focus:text-white focus:underline px-0 transition-colors duration-200"
+            >
+              <Link href="/login">
+                Quay lại trang đăng nhập
+              </Link>
+            </Button>
       </CardFooter>
     </Card>
+    </div>
   );
 }
